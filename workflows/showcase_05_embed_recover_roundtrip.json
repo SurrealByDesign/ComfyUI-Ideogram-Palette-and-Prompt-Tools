@@ -1,0 +1,128 @@
+{
+  "last_node_id": 12,
+  "last_link_id": 10,
+  "nodes": [
+    {
+      "id": 1, "type": "LoadImage", "pos": [40, 80], "size": [240, 320], "flags": {}, "order": 0, "mode": 0,
+      "outputs": [
+        { "name": "IMAGE", "type": "IMAGE", "links": [1, 5], "slot_index": 0 },
+        { "name": "MASK", "type": "MASK", "links": null }
+      ],
+      "widgets_values": ["reference.png", "image"], "title": "Source image"
+    },
+    {
+      "id": 2, "type": "IdeogramPaletteExtractor", "pos": [320, 80], "size": [240, 130], "flags": {}, "order": 1, "mode": 0,
+      "inputs": [ { "name": "image", "type": "IMAGE", "link": 1 } ],
+      "outputs": [
+        { "name": "palette_json", "type": "STRING", "links": [2], "slot_index": 0 },
+        { "name": "palette_preview", "type": "IMAGE", "links": null, "slot_index": 1 },
+        { "name": "color_count", "type": "INT", "links": null, "slot_index": 2 }
+      ],
+      "widgets_values": [8, 10.0]
+    },
+    {
+      "id": 3, "type": "IdeogramPaletteToGlobalJSON", "pos": [600, 80], "size": [240, 130], "flags": {}, "order": 2, "mode": 0,
+      "inputs": [ { "name": "palette_json", "type": "STRING", "link": 2 } ],
+      "outputs": [ { "name": "style_json", "type": "STRING", "links": [3], "slot_index": 0 } ],
+      "widgets_values": ["illustrative, bold", "even ambient light"]
+    },
+    {
+      "id": 4, "type": "IdeogramPromptAssembler", "pos": [880, 80], "size": [300, 200], "flags": {}, "order": 3, "mode": 0,
+      "inputs": [
+        { "name": "merge_json", "type": "STRING", "link": 3, "widget": { "name": "merge_json" } }
+      ],
+      "outputs": [
+        { "name": "prompt_json", "type": "STRING", "links": [4], "slot_index": 0 },
+        { "name": "report", "type": "STRING", "links": null, "slot_index": 1 }
+      ],
+      "widgets_values": ["{\"prompt\": \"a retro travel poster of a coastal town\", \"medium\": \"screen print\"}", "", true],
+      "title": "Assemble prompt to embed"
+    },
+    {
+      "id": 5, "type": "IdeogramMetadataEmbedder", "pos": [1220, 80], "size": [280, 170], "flags": {}, "order": 4, "mode": 0,
+      "inputs": [
+        { "name": "image", "type": "IMAGE", "link": 5 },
+        { "name": "prompt_json", "type": "STRING", "link": 4 }
+      ],
+      "outputs": [ { "name": "metadata_preview", "type": "STRING", "links": null, "slot_index": 0 } ],
+      "widgets_values": ["ideogram_roundtrip", "ideogram_prompt"],
+      "title": "EMBED: save PNG + prompt in tEXt"
+    },
+    {
+      "id": 6, "type": "IdeogramLoadImageWithPrompt", "pos": [40, 480], "size": [320, 130], "flags": {}, "order": 5, "mode": 0,
+      "inputs": [],
+      "outputs": [
+        { "name": "image", "type": "IMAGE", "links": [9], "slot_index": 0 },
+        { "name": "prompt_json", "type": "STRING", "links": [6], "slot_index": 1 },
+        { "name": "status", "type": "STRING", "links": [8], "slot_index": 2 }
+      ],
+      "widgets_values": ["ideogram_roundtrip_00001_.png", "ideogram_prompt"],
+      "title": "RECOVER: load PNG by path + read prompt"
+    },
+    {
+      "id": 7, "type": "IdeogramJSONValidator", "pos": [600, 480], "size": [240, 130], "flags": {}, "order": 6, "mode": 0,
+      "inputs": [ { "name": "prompt_json", "type": "STRING", "link": 6 } ],
+      "outputs": [
+        { "name": "prompt_json", "type": "STRING", "links": [7], "slot_index": 0 },
+        { "name": "is_valid", "type": "BOOLEAN", "links": null, "slot_index": 1 },
+        { "name": "report", "type": "STRING", "links": null, "slot_index": 2 }
+      ],
+      "widgets_values": [true, false], "title": "Validate recovered prompt"
+    },
+    {
+      "id": 8, "type": "ShowText|pysssss", "pos": [880, 480], "size": [400, 200], "flags": {}, "order": 7, "mode": 0,
+      "inputs": [ { "name": "text", "type": "STRING", "link": 7 } ],
+      "outputs": [ { "name": "STRING", "type": "STRING", "links": null } ],
+      "title": "Recovered + validated prompt JSON"
+    },
+    {
+      "id": 9, "type": "ShowText|pysssss", "pos": [320, 640], "size": [360, 90], "flags": {}, "order": 8, "mode": 0,
+      "inputs": [ { "name": "text", "type": "STRING", "link": 8 } ],
+      "outputs": [ { "name": "STRING", "type": "STRING", "links": null } ],
+      "title": "Recover status"
+    },
+    {
+      "id": 10, "type": "IdeogramMetadataReader", "pos": [40, 660], "size": [260, 110], "flags": {}, "order": 9, "mode": 0,
+      "inputs": [ { "name": "image", "type": "IMAGE", "link": 9 } ],
+      "outputs": [
+        { "name": "prompt_json", "type": "STRING", "links": null, "slot_index": 0 },
+        { "name": "status", "type": "STRING", "links": [10], "slot_index": 1 }
+      ],
+      "widgets_values": ["ideogram_prompt"],
+      "title": "MetadataReader (tensor input -> see caveat)"
+    },
+    {
+      "id": 11, "type": "ShowText|pysssss", "pos": [320, 780], "size": [360, 90], "flags": {}, "order": 10, "mode": 0,
+      "inputs": [ { "name": "text", "type": "STRING", "link": 10 } ],
+      "outputs": [ { "name": "STRING", "type": "STRING", "links": null } ],
+      "title": "MetadataReader status (expect: not found)"
+    },
+    {
+      "id": 12, "type": "Note", "pos": [40, -250], "size": [900, 210], "flags": {}, "order": 11, "mode": 0,
+      "properties": { "text": "" },
+      "widgets_values": ["EMBED -> RECOVER ROUNDTRIP\n\nPART A (top): extract a palette, build a prompt, and Metadata Embedder saves a PNG to ComfyUI/output with the prompt stored in a tEXt chunk.\n>>> RUN PART A FIRST - it writes ideogram_roundtrip_00001_.png\n\nPART B (bottom): Load Image With Prompt opens that saved file BY PATH and recovers the embedded prompt; the Validator re-checks it. Point 'image_path' at the file Part A wrote (adjust the _00001_ counter if your output folder already had ideogram_roundtrip files).\n\nThe Metadata Reader (bottom-left) is wired to the loaded TENSOR on purpose: it reports 'not found' because a ComfyUI IMAGE tensor carries NO metadata - which is exactly why the file-based Load Image With Prompt exists.\n\nNote: tEXt metadata only survives in PNG. Re-saving the file as JPEG destroys the embedded prompt. ShowText nodes are optional."],
+      "color": "#432", "bgcolor": "#653", "title": "README"
+    }
+  ],
+  "links": [
+    [1, 1, 0, 2, 0, "IMAGE"],
+    [2, 2, 0, 3, 0, "STRING"],
+    [3, 3, 0, 4, 0, "STRING"],
+    [4, 4, 0, 5, 1, "STRING"],
+    [5, 1, 0, 5, 0, "IMAGE"],
+    [6, 6, 1, 7, 0, "STRING"],
+    [7, 7, 0, 8, 0, "STRING"],
+    [8, 6, 2, 9, 0, "STRING"],
+    [9, 6, 0, 10, 0, "IMAGE"],
+    [10, 10, 1, 11, 0, "STRING"]
+  ],
+  "groups": [
+    { "title": "A - Embed on save", "bounding": [20, 20, 1490, 250], "color": "#3f789e" },
+    { "title": "B - Recover on load", "bounding": [20, 420, 1270, 470], "color": "#a1309b" }
+  ],
+  "config": {},
+  "extra": {
+    "note": "EMBED -> RECOVER ROUNDTRIP. PART A (top): extract a palette, build a prompt, and the Metadata Embedder saves a PNG to ComfyUI/output with the prompt stored in a tEXt chunk. RUN PART A FIRST -- it writes ideogram_roundtrip_00001_.png. PART B (bottom): the Load Image With Prompt node opens that saved file BY PATH and recovers the embedded prompt, which the Validator then re-checks (point image_path at the file Part A wrote; adjust the counter if needed). The Metadata Reader at the bottom-left is wired to the loaded IMAGE tensor on purpose to demonstrate the caveat: a ComfyUI IMAGE tensor carries NO metadata, so it reports 'not found' -- which is exactly why Load Image With Prompt (file-based) exists. ShowText nodes are OPTIONAL (ComfyUI-Custom-Scripts); the embedder's own preview confirms the save without them. NOTE: tEXt metadata only survives in PNG -- re-saving as JPEG destroys it."
+  },
+  "version": 0.4
+}

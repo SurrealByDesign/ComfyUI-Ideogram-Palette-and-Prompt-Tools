@@ -1,0 +1,112 @@
+{
+  "last_node_id": 10,
+  "last_link_id": 9,
+  "nodes": [
+    {
+      "id": 1, "type": "LoadImage", "pos": [40, 80], "size": [240, 320], "flags": {}, "order": 0, "mode": 0,
+      "outputs": [
+        { "name": "IMAGE", "type": "IMAGE", "links": [1, 2], "slot_index": 0 },
+        { "name": "MASK", "type": "MASK", "links": null }
+      ],
+      "widgets_values": ["reference.png", "image"], "title": "Reference image"
+    },
+    {
+      "id": 2, "type": "IdeogramPaletteExtractor", "pos": [320, 80], "size": [260, 130], "flags": {}, "order": 1, "mode": 0,
+      "inputs": [ { "name": "image", "type": "IMAGE", "link": 1 } ],
+      "outputs": [
+        { "name": "palette_json", "type": "STRING", "links": [3], "slot_index": 0 },
+        { "name": "palette_preview", "type": "IMAGE", "links": null, "slot_index": 1 },
+        { "name": "color_count", "type": "INT", "links": null, "slot_index": 2 }
+      ],
+      "widgets_values": [8, 10.0]
+    },
+    {
+      "id": 3, "type": "IdeogramPaletteOverride", "pos": [620, 80], "size": [260, 160], "flags": {}, "order": 2, "mode": 0,
+      "inputs": [
+        { "name": "palette_json", "type": "STRING", "link": 3 },
+        { "name": "add_colors", "type": "STRING", "link": null },
+        { "name": "remove_index", "type": "STRING", "link": null }
+      ],
+      "outputs": [
+        { "name": "palette_json", "type": "STRING", "links": [4], "slot_index": 0 },
+        { "name": "palette_preview", "type": "IMAGE", "links": [5], "slot_index": 1 }
+      ],
+      "widgets_values": [16, "", ""], "title": "Override (hand-tweak the palette)"
+    },
+    {
+      "id": 4, "type": "IdeogramPaletteToGlobalJSON", "pos": [920, 80], "size": [260, 130], "flags": {}, "order": 3, "mode": 0,
+      "inputs": [ { "name": "palette_json", "type": "STRING", "link": 4 } ],
+      "outputs": [ { "name": "style_json", "type": "STRING", "links": [6], "slot_index": 0 } ],
+      "widgets_values": ["painterly, atmospheric, high detail", "soft golden-hour backlight"],
+      "title": "Palette -> style_description"
+    },
+    {
+      "id": 5, "type": "IdeogramPromptAssembler", "pos": [1220, 80], "size": [300, 200], "flags": {}, "order": 4, "mode": 0,
+      "inputs": [
+        { "name": "merge_json", "type": "STRING", "link": 6, "widget": { "name": "merge_json" } }
+      ],
+      "outputs": [
+        { "name": "prompt_json", "type": "STRING", "links": [7], "slot_index": 0 },
+        { "name": "report", "type": "STRING", "links": null, "slot_index": 1 }
+      ],
+      "widgets_values": ["{\"prompt\": \"a serene mountain lake at dawn, distant snow-capped peaks\", \"medium\": \"digital painting\"}", "", true],
+      "title": "Assemble into full prompt (base_json + palette)"
+    },
+    {
+      "id": 6, "type": "IdeogramJSONValidator", "pos": [1560, 80], "size": [260, 130], "flags": {}, "order": 5, "mode": 0,
+      "inputs": [ { "name": "prompt_json", "type": "STRING", "link": 7 } ],
+      "outputs": [
+        { "name": "prompt_json", "type": "STRING", "links": [8, 9], "slot_index": 0 },
+        { "name": "is_valid", "type": "BOOLEAN", "links": null, "slot_index": 1 },
+        { "name": "report", "type": "STRING", "links": null, "slot_index": 2 }
+      ],
+      "widgets_values": [true, false], "title": "Validate + fix key order"
+    },
+    {
+      "id": 7, "type": "IdeogramMetadataEmbedder", "pos": [1860, 80], "size": [280, 170], "flags": {}, "order": 6, "mode": 0,
+      "inputs": [
+        { "name": "image", "type": "IMAGE", "link": 2 },
+        { "name": "prompt_json", "type": "STRING", "link": 8 }
+      ],
+      "outputs": [ { "name": "metadata_preview", "type": "STRING", "links": null, "slot_index": 0 } ],
+      "widgets_values": ["ideogram_pipeline", "ideogram_prompt"],
+      "title": "Save PNG + embed prompt"
+    },
+    {
+      "id": 8, "type": "PreviewImage", "pos": [620, 300], "size": [260, 260], "flags": {}, "order": 7, "mode": 0,
+      "inputs": [ { "name": "images", "type": "IMAGE", "link": 5 } ], "outputs": [], "title": "Final palette swatch"
+    },
+    {
+      "id": 9, "type": "ShowText|pysssss", "pos": [1560, 300], "size": [400, 220], "flags": {}, "order": 8, "mode": 0,
+      "inputs": [ { "name": "text", "type": "STRING", "link": 9 } ],
+      "outputs": [ { "name": "STRING", "type": "STRING", "links": null } ],
+      "title": "Assembled Ideogram 4 prompt JSON (optional display)"
+    },
+    {
+      "id": 10, "type": "Note", "pos": [40, -250], "size": [840, 210], "flags": {}, "order": 9, "mode": 0,
+      "properties": { "text": "" },
+      "widgets_values": ["PALETTE -> PROMPT PIPELINE\n\nTurns one reference image into a complete, validated Ideogram 4 prompt with the embedded palette, saved to ComfyUI/output.\n\nFlow: Load Image -> Extractor -> Override -> Palette->Global JSON -> Prompt Assembler -> JSON Validator -> Metadata Embedder.\n\nSet before running:\n  - Palette->Global JSON: aesthetics + lighting text\n  - Prompt Assembler 'base_json': your subject + medium\n  - Override: add/remove colors to hand-tweak the palette (optional)\n\nThe ShowText node is optional (needs ComfyUI-Custom-Scripts) and only displays the JSON.\nTo GENERATE an image, feed the Validator's prompt_json into your Ideogram generation node."],
+      "color": "#432", "bgcolor": "#653", "title": "README"
+    }
+  ],
+  "links": [
+    [1, 1, 0, 2, 0, "IMAGE"],
+    [2, 1, 0, 7, 0, "IMAGE"],
+    [3, 2, 0, 3, 0, "STRING"],
+    [4, 3, 0, 4, 0, "STRING"],
+    [5, 3, 1, 8, 0, "IMAGE"],
+    [6, 4, 0, 5, 0, "STRING"],
+    [7, 5, 0, 6, 0, "STRING"],
+    [8, 6, 0, 7, 1, "STRING"],
+    [9, 6, 0, 9, 0, "STRING"]
+  ],
+  "groups": [
+    { "title": "Extract -> edit palette", "bounding": [20, 20, 870, 560], "color": "#3f789e" },
+    { "title": "Build -> validate -> save full prompt", "bounding": [910, 20, 1240, 520], "color": "#88A" }
+  ],
+  "config": {},
+  "extra": {
+    "note": "FLAGSHIP PIPELINE: one reference image becomes a complete, validated Ideogram 4 prompt with the embedded palette, saved to disk. Flow: LoadImage -> Extractor -> Override (hand-tweak) -> Palette->Global JSON (adds aesthetics/lighting) -> Prompt Assembler (deep-merges the style_description into the base prompt typed in base_json) -> JSON Validator (PASS/FAIL + key-order fix) -> Metadata Embedder (saves the PNG with the prompt in a tEXt chunk). Set the base subject/medium in the Assembler's base_json widget; set aesthetics + lighting on the Palette->Global JSON node. The Validator warns (not errors) about missing top-level keys when the prompt is a partial schema, so it still PASSes. The ShowText node is OPTIONAL (from ComfyUI-Custom-Scripts) and only displays the final JSON -- delete it or swap for any STRING display node if you don't have it. To actually GENERATE, feed the Validator's prompt_json into your Ideogram generation node (API node or a text encoder) instead of / in addition to the Embedder."
+  },
+  "version": 0.4
+}

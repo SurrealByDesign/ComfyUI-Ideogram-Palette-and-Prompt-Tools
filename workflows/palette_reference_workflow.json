@@ -1,5 +1,5 @@
 {
-  "last_node_id": 6,
+  "last_node_id": 7,
   "last_link_id": 5,
   "nodes": [
     {
@@ -98,6 +98,12 @@
       "outputs": [
         { "name": "STRING", "type": "STRING", "links": null }
       ]
+    },
+    {
+      "id": 7, "type": "Note", "pos": [40, -200], "size": [780, 160], "flags": {}, "order": 6, "mode": 0,
+      "properties": { "text": "" },
+      "widgets_values": ["CORE PALETTE PIPELINE (minimal example)\n\nLoad Image -> Extractor -> Override -> Palette->Global JSON.\n\nThe style_json output is a style_description fragment ready to merge into a full Ideogram 4 prompt (e.g. with IdeogramPromptAssembler, or paste it by hand). ShowText is optional (ComfyUI-Custom-Scripts) and just displays the raw extractor JSON.\n\nFor a complete extract -> assemble -> validate -> save pipeline, see workflows/showcase_01_palette_to_prompt_pipeline.json."],
+      "color": "#432", "bgcolor": "#653", "title": "README"
     }
   ],
   "links": [

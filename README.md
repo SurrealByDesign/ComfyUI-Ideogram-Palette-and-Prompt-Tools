@@ -194,6 +194,35 @@ seed** — not a single batched run. Two ways to do it:
   CLIPTextEncode → KSampler → VAEDecode chain with the **same seed** and
   `batch_size=1` on every sampler.
 
+## Showcase workflows
+
+A set of five ready-to-load workflows under [`workflows/`](workflows/) that
+demonstrate the nodes working together, from a single extraction up to a full
+extract → assemble → validate → embed pipeline. Load any of them via ComfyUI's
+**Workflow → Open** menu and point the `LoadImage` node(s) at your own reference.
+
+| Workflow | What it shows | Nodes wired together |
+| --- | --- | --- |
+| [`showcase_01_palette_to_prompt_pipeline.json`](workflows/showcase_01_palette_to_prompt_pipeline.json) | The flagship chain: a reference image becomes a complete, validated Ideogram 4 prompt with the embedded palette, saved to disk. | Extractor → Override → Palette→Global JSON → Prompt Assembler → JSON Validator → Metadata Embedder |
+| [`showcase_02_blend_content_and_style.json`](workflows/showcase_02_blend_content_and_style.json) | Mix a **content** reference palette with a **style** reference palette (tune `blend_ratio`), then build and save a prompt from the blend. | 2× Extractor → Palette Blend → Palette→Global JSON → Prompt Assembler → JSON Validator → Metadata Embedder |
+| [`showcase_03_vibrant_vs_frequency.json`](workflows/showcase_03_vibrant_vs_frequency.json) | Same image, four rankings side by side — the default frequency extractor vs. the Vibrant Extractor in `vibrant` / `muted` / `dark_vibrant` modes. | Extractor + 3× Vibrant Extractor → Palette→Global JSON |
+| [`showcase_04_masked_subject_and_global.json`](workflows/showcase_04_masked_subject_and_global.json) | Build a structured prompt with **two** palettes: a region-accurate per-element palette from a masked subject, plus the global palette from the whole frame. | Masked Extractor → Override (≤5) ‖ Element Palette ‖ Extractor → Palette→Global JSON |
+| [`showcase_05_embed_recover_roundtrip.json`](workflows/showcase_05_embed_recover_roundtrip.json) | The metadata loop closing: embed a prompt on save, then recover it from the saved PNG by path (and why the tensor-based reader can't). | Extractor → Palette→Global JSON → Prompt Assembler → Metadata Embedder … Load Image With Prompt → JSON Validator (+ Metadata Reader caveat) |
+
+A few notes that apply across the set:
+
+- **Text-display nodes are optional.** Where a workflow shows a raw JSON string it
+  uses `ShowText|pysssss` (from [ComfyUI-Custom-Scripts](https://github.com/pythongosssss/ComfyUI-Custom-Scripts)).
+  These are clearly marked and can be deleted or swapped for any STRING-display
+  node — the core pipeline runs without them. All swatch previews use the stock
+  `PreviewImage` node, and the Metadata Embedder previews its own saved image.
+- **Generation is left to you.** These workflows produce a finished `prompt_json`;
+  feed that into whatever Ideogram generation node you use (an API node, or a text
+  encoder for a local model). This mirrors the colorway-study workflows, which
+  deliberately stop at `style_json` so they stay backend-agnostic.
+- Workflow 05 has two halves — run **Part A first** so it writes the PNG that
+  **Part B** then loads back by path.
+
 ## Installation
 
 Clone (or copy) this repository into your ComfyUI `custom_nodes/` directory and
@@ -239,6 +268,7 @@ python tests/test_prompt_assembler.py    # deep merge, palette injection, key or
 python tests/test_metadata_file_reader.py # load PNG by path + recover prompt
 python tests/test_masked_palette_extractor.py # region-restricted extraction
 python tests/test_vibrant_palette_extractor.py # vibrancy ranking vs frequency
+python tests/test_workflows.py                 # workflow JSONs match node signatures, no dangling links
 ```
 
 `test_extractor.py` exercises the extraction core against four synthetic

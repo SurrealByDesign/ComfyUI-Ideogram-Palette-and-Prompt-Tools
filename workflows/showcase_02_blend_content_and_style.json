@@ -1,0 +1,141 @@
+{
+  "last_node_id": 14,
+  "last_link_id": 13,
+  "nodes": [
+    {
+      "id": 1, "type": "LoadImage", "pos": [40, 60], "size": [240, 300], "flags": {}, "order": 0, "mode": 0,
+      "outputs": [
+        { "name": "IMAGE", "type": "IMAGE", "links": [1, 2], "slot_index": 0 },
+        { "name": "MASK", "type": "MASK", "links": null }
+      ],
+      "widgets_values": ["content_reference.png", "image"], "title": "Content reference"
+    },
+    {
+      "id": 2, "type": "LoadImage", "pos": [40, 420], "size": [240, 300], "flags": {}, "order": 1, "mode": 0,
+      "outputs": [
+        { "name": "IMAGE", "type": "IMAGE", "links": [3], "slot_index": 0 },
+        { "name": "MASK", "type": "MASK", "links": null }
+      ],
+      "widgets_values": ["style_reference.png", "image"], "title": "Style reference"
+    },
+    {
+      "id": 3, "type": "IdeogramPaletteExtractor", "pos": [320, 60], "size": [250, 130], "flags": {}, "order": 2, "mode": 0,
+      "inputs": [ { "name": "image", "type": "IMAGE", "link": 1 } ],
+      "outputs": [
+        { "name": "palette_json", "type": "STRING", "links": [4], "slot_index": 0 },
+        { "name": "palette_preview", "type": "IMAGE", "links": [6], "slot_index": 1 },
+        { "name": "color_count", "type": "INT", "links": null, "slot_index": 2 }
+      ],
+      "widgets_values": [8, 10.0], "title": "Content palette"
+    },
+    {
+      "id": 4, "type": "IdeogramPaletteExtractor", "pos": [320, 420], "size": [250, 130], "flags": {}, "order": 3, "mode": 0,
+      "inputs": [ { "name": "image", "type": "IMAGE", "link": 3 } ],
+      "outputs": [
+        { "name": "palette_json", "type": "STRING", "links": [5], "slot_index": 0 },
+        { "name": "palette_preview", "type": "IMAGE", "links": [7], "slot_index": 1 },
+        { "name": "color_count", "type": "INT", "links": null, "slot_index": 2 }
+      ],
+      "widgets_values": [8, 10.0], "title": "Style palette"
+    },
+    {
+      "id": 5, "type": "IdeogramPaletteBlend", "pos": [620, 240], "size": [260, 130], "flags": {}, "order": 4, "mode": 0,
+      "inputs": [
+        { "name": "palette_a", "type": "STRING", "link": 4 },
+        { "name": "palette_b", "type": "STRING", "link": 5 }
+      ],
+      "outputs": [
+        { "name": "palette_json", "type": "STRING", "links": [8], "slot_index": 0 },
+        { "name": "palette_preview", "type": "IMAGE", "links": [9], "slot_index": 1 }
+      ],
+      "widgets_values": [0.5, 8], "title": "Blend (ratio = content<->style)"
+    },
+    {
+      "id": 6, "type": "IdeogramPaletteToGlobalJSON", "pos": [920, 240], "size": [250, 130], "flags": {}, "order": 5, "mode": 0,
+      "inputs": [ { "name": "palette_json", "type": "STRING", "link": 8 } ],
+      "outputs": [ { "name": "style_json", "type": "STRING", "links": [10], "slot_index": 0 } ],
+      "widgets_values": ["cinematic, rich contrast", "dramatic side lighting"],
+      "title": "Blended palette -> style_description"
+    },
+    {
+      "id": 7, "type": "IdeogramPromptAssembler", "pos": [1220, 240], "size": [300, 200], "flags": {}, "order": 6, "mode": 0,
+      "inputs": [
+        { "name": "merge_json", "type": "STRING", "link": 10, "widget": { "name": "merge_json" } }
+      ],
+      "outputs": [
+        { "name": "prompt_json", "type": "STRING", "links": [11], "slot_index": 0 },
+        { "name": "report", "type": "STRING", "links": null, "slot_index": 1 }
+      ],
+      "widgets_values": ["{\"prompt\": \"a lone figure on a windswept ridge\", \"medium\": \"matte painting\"}", "", true],
+      "title": "Assemble into full prompt"
+    },
+    {
+      "id": 8, "type": "IdeogramJSONValidator", "pos": [1560, 240], "size": [250, 130], "flags": {}, "order": 7, "mode": 0,
+      "inputs": [ { "name": "prompt_json", "type": "STRING", "link": 11 } ],
+      "outputs": [
+        { "name": "prompt_json", "type": "STRING", "links": [12, 13], "slot_index": 0 },
+        { "name": "is_valid", "type": "BOOLEAN", "links": null, "slot_index": 1 },
+        { "name": "report", "type": "STRING", "links": null, "slot_index": 2 }
+      ],
+      "widgets_values": [true, false], "title": "Validate"
+    },
+    {
+      "id": 9, "type": "PreviewImage", "pos": [320, 200], "size": [250, 130], "flags": {}, "order": 8, "mode": 0,
+      "inputs": [ { "name": "images", "type": "IMAGE", "link": 6 } ], "outputs": [], "title": "Content swatch"
+    },
+    {
+      "id": 10, "type": "PreviewImage", "pos": [320, 560], "size": [250, 130], "flags": {}, "order": 9, "mode": 0,
+      "inputs": [ { "name": "images", "type": "IMAGE", "link": 7 } ], "outputs": [], "title": "Style swatch"
+    },
+    {
+      "id": 11, "type": "PreviewImage", "pos": [620, 400], "size": [260, 150], "flags": {}, "order": 10, "mode": 0,
+      "inputs": [ { "name": "images", "type": "IMAGE", "link": 9 } ], "outputs": [], "title": "Blended swatch"
+    },
+    {
+      "id": 12, "type": "ShowText|pysssss", "pos": [1560, 400], "size": [400, 200], "flags": {}, "order": 11, "mode": 0,
+      "inputs": [ { "name": "text", "type": "STRING", "link": 12 } ],
+      "outputs": [ { "name": "STRING", "type": "STRING", "links": null } ],
+      "title": "Blended-palette prompt JSON (optional display)"
+    },
+    {
+      "id": 13, "type": "IdeogramMetadataEmbedder", "pos": [1860, 240], "size": [280, 170], "flags": {}, "order": 12, "mode": 0,
+      "inputs": [
+        { "name": "image", "type": "IMAGE", "link": 2 },
+        { "name": "prompt_json", "type": "STRING", "link": 13 }
+      ],
+      "outputs": [ { "name": "metadata_preview", "type": "STRING", "links": null, "slot_index": 0 } ],
+      "widgets_values": ["ideogram_blend", "ideogram_prompt"],
+      "title": "Save content image + blended prompt"
+    },
+    {
+      "id": 14, "type": "Note", "pos": [40, -240], "size": [840, 200], "flags": {}, "order": 13, "mode": 0,
+      "properties": { "text": "" },
+      "widgets_values": ["BLEND CONTENT + STYLE\n\nExtracts a palette from a CONTENT reference and a STYLE reference, then Palette Blend mixes the two.\n\nTune 'blend_ratio' on the Blend node:\n  0.0 = all content   |   0.5 = even mix   |   1.0 = all style\n\nThe blended palette becomes a style_description, is merged into the base prompt (Prompt Assembler 'base_json'), validated, and saved onto the content image.\n\nShowText is optional (ComfyUI-Custom-Scripts). To render, feed the Validator's prompt_json into your Ideogram generation node."],
+      "color": "#432", "bgcolor": "#653", "title": "README"
+    }
+  ],
+  "links": [
+    [1, 1, 0, 3, 0, "IMAGE"],
+    [2, 1, 0, 13, 0, "IMAGE"],
+    [3, 2, 0, 4, 0, "IMAGE"],
+    [4, 3, 0, 5, 0, "STRING"],
+    [5, 4, 0, 5, 1, "STRING"],
+    [6, 3, 1, 9, 0, "IMAGE"],
+    [7, 4, 1, 10, 0, "IMAGE"],
+    [8, 5, 0, 6, 0, "STRING"],
+    [9, 5, 1, 11, 0, "IMAGE"],
+    [10, 6, 0, 7, 0, "STRING"],
+    [11, 7, 0, 8, 0, "STRING"],
+    [12, 8, 0, 12, 0, "STRING"],
+    [13, 8, 0, 13, 1, "STRING"]
+  ],
+  "groups": [
+    { "title": "Two references -> two palettes", "bounding": [20, 20, 560, 700], "color": "#3f789e" },
+    { "title": "Blend -> prompt -> save", "bounding": [600, 180, 1550, 440], "color": "#a1309b" }
+  ],
+  "config": {},
+  "extra": {
+    "note": "BLEND CONTENT + STYLE: extract a palette from a CONTENT reference and a STYLE reference, then Palette Blend mixes them by blend_ratio (0.0 = all content, 1.0 = all style). The blended palette is wrapped into a style_description, merged into a base prompt, validated, and saved onto the content image. Tune the blend_ratio widget to lean toward either reference. ShowText is OPTIONAL (ComfyUI-Custom-Scripts) -- delete or swap if not installed. To generate, route the Validator's prompt_json into your Ideogram generation node."
+  },
+  "version": 0.4
+}
