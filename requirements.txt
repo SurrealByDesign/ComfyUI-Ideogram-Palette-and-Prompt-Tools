@@ -1,0 +1,6 @@
+# All dependencies below are already present in a standard ComfyUI installation.
+# Listed here for reference only — do not pip install separately.
+Pillow
+numpy
+scikit-learn
+torch

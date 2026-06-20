@@ -1,0 +1,18 @@
+[project]
+name = "comfyui-ideogram-palette-and-prompt-tools"
+description = "Extract color palettes from reference images and assemble/validate/embed Ideogram 4's structured prompt JSON."
+version = "1.0.0"
+license = { file = "LICENSE" }
+authors = [
+  { name = "SurrealByDesign" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+
+[project.urls]
+Repository = "https://github.com/SurrealByDesign/ComfyUI-Ideogram-Palette-and-Prompt-Tools"
+
+[tool.comfy]
+PublisherId = "SurrealByDesign"
+DisplayName = "ComfyUI Ideogram Palette and Prompt Tools"
+Icon = ""

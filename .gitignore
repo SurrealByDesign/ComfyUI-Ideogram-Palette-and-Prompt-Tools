@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Generated outputs / batch studies (assets/ holds the curated README images)
+out/
+tests/batch_study/
+
+# User-specific exported workflow (contains local model/LoRA names)
+workflows/ideogram4_studio_api.json
+
+# Local Claude Code session config
+.claude/
+
+# OS cruft
+.DS_Store
+Thumbs.db

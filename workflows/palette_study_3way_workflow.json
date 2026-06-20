@@ -1,0 +1,127 @@
+{
+  "_comment": "Palette study: SAME image, three different palettes. Three IdeogramPaletteExtractor branches (one per reference image) each feed an IdeogramPaletteToGlobalJSON, which you merge into your generation prompt. To get the SAME composition with only the palette changing, wire all three into your generation graph using ONE shared seed value and batch_size=1 per branch. This example shows the palette-extraction side; connect each style_json to a parallel copy of your KSampler->VAEDecode->Preview chain. See tools/palette_batch.py for the scalable CLI version.",
+  "last_node_id": 12,
+  "last_link_id": 12,
+  "nodes": [
+    {
+      "id": 1, "type": "LoadImage", "pos": [40, 40], "size": [220, 300], "flags": {}, "order": 0, "mode": 0,
+      "outputs": [
+        { "name": "IMAGE", "type": "IMAGE", "links": [1], "slot_index": 0 },
+        { "name": "MASK", "type": "MASK", "links": null }
+      ],
+      "widgets_values": ["reference_a.png", "image"], "title": "Reference A"
+    },
+    {
+      "id": 2, "type": "LoadImage", "pos": [40, 380], "size": [220, 300], "flags": {}, "order": 1, "mode": 0,
+      "outputs": [
+        { "name": "IMAGE", "type": "IMAGE", "links": [2], "slot_index": 0 },
+        { "name": "MASK", "type": "MASK", "links": null }
+      ],
+      "widgets_values": ["reference_b.png", "image"], "title": "Reference B"
+    },
+    {
+      "id": 3, "type": "LoadImage", "pos": [40, 720], "size": [220, 300], "flags": {}, "order": 2, "mode": 0,
+      "outputs": [
+        { "name": "IMAGE", "type": "IMAGE", "links": [3], "slot_index": 0 },
+        { "name": "MASK", "type": "MASK", "links": null }
+      ],
+      "widgets_values": ["reference_c.png", "image"], "title": "Reference C"
+    },
+    {
+      "id": 4, "type": "IdeogramPaletteExtractor", "pos": [300, 60], "size": [250, 130], "flags": {}, "order": 3, "mode": 0,
+      "inputs": [ { "name": "image", "type": "IMAGE", "link": 1 } ],
+      "outputs": [
+        { "name": "palette_json", "type": "STRING", "links": [4], "slot_index": 0 },
+        { "name": "palette_preview", "type": "IMAGE", "links": [10], "slot_index": 1 },
+        { "name": "color_count", "type": "INT", "links": null, "slot_index": 2 }
+      ],
+      "widgets_values": [8, 10.0]
+    },
+    {
+      "id": 5, "type": "IdeogramPaletteExtractor", "pos": [300, 400], "size": [250, 130], "flags": {}, "order": 4, "mode": 0,
+      "inputs": [ { "name": "image", "type": "IMAGE", "link": 2 } ],
+      "outputs": [
+        { "name": "palette_json", "type": "STRING", "links": [5], "slot_index": 0 },
+        { "name": "palette_preview", "type": "IMAGE", "links": [11], "slot_index": 1 },
+        { "name": "color_count", "type": "INT", "links": null, "slot_index": 2 }
+      ],
+      "widgets_values": [8, 10.0]
+    },
+    {
+      "id": 6, "type": "IdeogramPaletteExtractor", "pos": [300, 740], "size": [250, 130], "flags": {}, "order": 5, "mode": 0,
+      "inputs": [ { "name": "image", "type": "IMAGE", "link": 3 } ],
+      "outputs": [
+        { "name": "palette_json", "type": "STRING", "links": [6], "slot_index": 0 },
+        { "name": "palette_preview", "type": "IMAGE", "links": [12], "slot_index": 1 },
+        { "name": "color_count", "type": "INT", "links": null, "slot_index": 2 }
+      ],
+      "widgets_values": [8, 10.0]
+    },
+    {
+      "id": 7, "type": "IdeogramPaletteToGlobalJSON", "pos": [600, 60], "size": [260, 110], "flags": {}, "order": 6, "mode": 0,
+      "inputs": [
+        { "name": "palette_json", "type": "STRING", "link": 4 },
+        { "name": "aesthetics", "type": "STRING", "link": null },
+        { "name": "lighting", "type": "STRING", "link": null }
+      ],
+      "outputs": [ { "name": "style_json", "type": "STRING", "links": [7], "slot_index": 0 } ],
+      "widgets_values": ["", ""], "title": "Style JSON A"
+    },
+    {
+      "id": 8, "type": "IdeogramPaletteToGlobalJSON", "pos": [600, 400], "size": [260, 110], "flags": {}, "order": 7, "mode": 0,
+      "inputs": [
+        { "name": "palette_json", "type": "STRING", "link": 5 },
+        { "name": "aesthetics", "type": "STRING", "link": null },
+        { "name": "lighting", "type": "STRING", "link": null }
+      ],
+      "outputs": [ { "name": "style_json", "type": "STRING", "links": [8], "slot_index": 0 } ],
+      "widgets_values": ["", ""], "title": "Style JSON B"
+    },
+    {
+      "id": 9, "type": "IdeogramPaletteToGlobalJSON", "pos": [600, 740], "size": [260, 110], "flags": {}, "order": 8, "mode": 0,
+      "inputs": [
+        { "name": "palette_json", "type": "STRING", "link": 6 },
+        { "name": "aesthetics", "type": "STRING", "link": null },
+        { "name": "lighting", "type": "STRING", "link": null }
+      ],
+      "outputs": [ { "name": "style_json", "type": "STRING", "links": [9], "slot_index": 0 } ],
+      "widgets_values": ["", ""], "title": "Style JSON C"
+    },
+    {
+      "id": 10, "type": "PreviewImage", "pos": [900, 60], "size": [240, 130], "flags": {}, "order": 9, "mode": 0,
+      "inputs": [ { "name": "images", "type": "IMAGE", "link": 10 } ], "outputs": [], "title": "Palette A"
+    },
+    {
+      "id": 11, "type": "PreviewImage", "pos": [900, 400], "size": [240, 130], "flags": {}, "order": 10, "mode": 0,
+      "inputs": [ { "name": "images", "type": "IMAGE", "link": 11 } ], "outputs": [], "title": "Palette B"
+    },
+    {
+      "id": 12, "type": "PreviewImage", "pos": [900, 740], "size": [240, 130], "flags": {}, "order": 11, "mode": 0,
+      "inputs": [ { "name": "images", "type": "IMAGE", "link": 12 } ], "outputs": [], "title": "Palette C"
+    }
+  ],
+  "links": [
+    [1, 1, 0, 4, 0, "IMAGE"],
+    [2, 2, 0, 5, 0, "IMAGE"],
+    [3, 3, 0, 6, 0, "IMAGE"],
+    [4, 4, 0, 7, 0, "STRING"],
+    [5, 5, 0, 8, 0, "STRING"],
+    [6, 6, 0, 9, 0, "STRING"],
+    [7, 7, 0, 0, 0, "STRING"],
+    [8, 8, 0, 0, 0, "STRING"],
+    [9, 9, 0, 0, 0, "STRING"],
+    [10, 4, 1, 10, 0, "IMAGE"],
+    [11, 5, 1, 11, 0, "IMAGE"],
+    [12, 6, 1, 12, 0, "IMAGE"]
+  ],
+  "groups": [
+    { "title": "Reference A -> Palette A", "bounding": [20, 10, 1130, 200], "color": "#3f789e" },
+    { "title": "Reference B -> Palette B", "bounding": [20, 350, 1130, 200], "color": "#3f789e" },
+    { "title": "Reference C -> Palette C", "bounding": [20, 690, 1130, 200], "color": "#3f789e" }
+  ],
+  "config": {},
+  "extra": {
+    "note": "style_json A/B/C each carry a different palette. To produce the SAME image recolored three ways, feed each style_json into its own copy of your generation chain (CLIPTextEncode -> KSampler -> VAEDecode -> PreviewImage) where EVERY KSampler uses the identical seed and batch_size=1. Identical seed + batch_size=1 gives identical noise, so only the palette differs. For more than ~3 palettes use tools/palette_batch.py instead."
+  },
+  "version": 0.4
+}
