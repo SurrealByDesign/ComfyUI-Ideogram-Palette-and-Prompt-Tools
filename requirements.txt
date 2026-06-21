@@ -1,6 +1,9 @@
-# All dependencies below are already present in a standard ComfyUI installation.
-# Listed here for reference only — do not pip install separately.
-Pillow
-numpy
+# scikit-learn is the ONLY extra dependency this package needs — it is not part
+# of a base ComfyUI install. ComfyUI-Manager installs this file automatically.
 scikit-learn
-torch
+
+# Intentionally NOT listed: torch, numpy, Pillow.
+# ComfyUI already ships these, and pinning/reinstalling them here is harmful —
+# in particular, reinstalling torch can pull a build that does not match the
+# user's CUDA/ComfyUI setup and break their installation. The package imports
+# them at runtime but must rely on the versions ComfyUI already provides.

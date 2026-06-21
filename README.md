@@ -233,10 +233,20 @@ cd ComfyUI/custom_nodes
 git clone https://github.com/SurrealByDesign/ComfyUI-Ideogram-Palette-and-Prompt-Tools
 ```
 
-No extra pip installs are required — only Pillow, numpy, scikit-learn, and torch
-are used, all of which ship with a standard ComfyUI environment (see
-[`requirements.txt`](requirements.txt) for reference). After restarting, the
-twelve nodes appear in the node menu under **`Ideogram/Palette`**.
+The only extra dependency is **scikit-learn** (used for k-means clustering),
+which is not part of a base ComfyUI install. ComfyUI-Manager installs it
+automatically from [`requirements.txt`](requirements.txt); to install it by
+hand into ComfyUI's Python:
+
+```
+pip install scikit-learn
+```
+
+The package also uses `torch`, `numpy`, and `Pillow`, but those ship with
+ComfyUI and are **deliberately not** listed in `requirements.txt` — reinstalling
+them (torch especially) can pull a build that doesn't match your ComfyUI/CUDA
+setup and break the install. After restarting, the twelve nodes appear in the
+node menu under **`Ideogram/Palette`**.
 
 ## Design notes
 
