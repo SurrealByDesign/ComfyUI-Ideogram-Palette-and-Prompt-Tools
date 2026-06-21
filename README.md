@@ -50,6 +50,10 @@ them (torch especially) can pull a build that doesn't match your ComfyUI/CUDA
 setup and break the install. After restarting, the fourteen nodes appear in the
 node menu under **`Ideogram/Palette`**.
 
+Tested against ComfyUI 0.24.0 on Python 3.12. `requires-python = ">=3.10"` in
+[`pyproject.toml`](pyproject.toml) is the floor, not a guarantee for every
+ComfyUI version — open an issue if something doesn't load on yours.
+
 ## Why This Exists
 
 Ideogram 4's most powerful prompting feature — structured JSON prompts with

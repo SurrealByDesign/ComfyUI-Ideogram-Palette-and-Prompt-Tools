@@ -1,0 +1,9 @@
+# Normalize line endings to LF in the repo regardless of a contributor's
+# platform/git config, so cross-platform diffs stay clean (this repo has hit
+# CRLF/LF warnings on every commit without this).
+* text=auto eol=lf
+
+# Binary assets: never run through text normalization or diff.
+*.png binary
+*.jpg binary
+*.jpeg binary
