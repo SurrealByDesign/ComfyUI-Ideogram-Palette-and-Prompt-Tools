@@ -342,6 +342,7 @@ python tests/test_prompt_assembler.py    # deep merge, palette injection, key or
 python tests/test_metadata_file_reader.py # load PNG by path + recover prompt
 python tests/test_masked_palette_extractor.py # region-restricted extraction
 python tests/test_vibrant_palette_extractor.py # vibrancy ranking vs frequency
+python tests/test_element_builder.py           # element builder/collector: build, clamp, overlap
 python tests/test_workflows.py                 # workflow JSONs match node signatures, no dangling links
 ```
 
@@ -352,8 +353,8 @@ logo, multi-color painting blend, near-monochrome fog/snow) under
 nodes have also been validated against real Ideogram 4 generations in a live
 ComfyUI install; the metadata embedder, palette blend, metadata reader, JSON
 validator, prompt assembler, file-based image/prompt loader, masked palette
-extractor, and vibrant palette extractor have full unit-test coverage and are
-pending live verification.
+extractor, vibrant palette extractor, element builder, and element collector
+have full unit-test coverage and are pending live verification.
 
 ## License
 

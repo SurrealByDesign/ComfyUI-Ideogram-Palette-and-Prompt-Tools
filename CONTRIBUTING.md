@@ -40,9 +40,9 @@ They split into two groups:
 
 **Torch-free** — run in any Python with `Pillow`, `numpy`, and
 `scikit-learn`:
-`test_color_utils.py`, `test_extractor.py`, `test_json_validator.py`,
-`test_metadata_reader.py`, `test_palette_blend.py`, `test_palette_override.py`,
-`test_palette_to_json.py`, `test_prompt_assembler.py`.
+`test_color_utils.py`, `test_element_builder.py`, `test_extractor.py`,
+`test_json_validator.py`, `test_metadata_reader.py`, `test_palette_blend.py`,
+`test_palette_override.py`, `test_palette_to_json.py`, `test_prompt_assembler.py`.
 
 **Require `torch`** (run with ComfyUI's Python — see above):
 `test_masked_palette_extractor.py`, `test_metadata_embedder.py`,
