@@ -55,11 +55,12 @@ need to mention `torch` to require it.
 **Torch-free** — run in any Python with `Pillow`, `numpy`, and
 `scikit-learn`:
 `test_color_utils.py`, `test_element_builder.py`, `test_json_validator.py`,
-`test_metadata_reader.py`, `test_palette_to_json.py`, `test_prompt_assembler.py`.
+`test_palette_to_json.py`, `test_prompt_assembler.py`.
 
 **Require `torch`** (run with ComfyUI's Python — see above):
 `test_extractor.py`, `test_masked_palette_extractor.py`,
 `test_metadata_embedder.py`, `test_metadata_file_reader.py`,
+`test_metadata_reader.py` (its `read()` tests build a real IMAGE tensor),
 `test_palette_blend.py`, `test_palette_override.py`,
 `test_vibrant_palette_extractor.py`, and `test_workflows.py` (it imports
 the full node package, which pulls in `torch` transitively).
