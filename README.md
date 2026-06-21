@@ -283,10 +283,10 @@ A few notes that apply across the set:
 - **Fails gracefully.** Every node has a fallback (e.g. flat gray `#808080`)
   so a bad or degenerate image (single color, tiny image, parse errors) never
   crashes the workflow — it just produces a less interesting palette.
-- **Strict key ordering.** Ideogram 4 was trained on consistently ordered
-  JSON; this package always emits `aesthetics` -> `lighting` ->
-  `color_palette` inside `style_description`, matching the schema in the
-  project bible.
+- **Strict key ordering.** This package always emits `aesthetics` -> `lighting` ->
+  `color_palette` inside `style_description` (see the field order documented
+  for each node in [Nodes](#nodes)), since Ideogram 4 is sensitive to JSON key
+  order in structured prompts.
 
 ## Testing
 

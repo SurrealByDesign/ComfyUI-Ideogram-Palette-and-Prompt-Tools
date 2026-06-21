@@ -1,6 +1,10 @@
-"""Tests for IdeogramPaletteExtractor's core extraction logic against the four
-required image types from the bible's Section 8 testing checklist:
-photograph, logo/graphic, painting, near-monochrome.
+"""Tests for IdeogramPaletteExtractor's core extraction logic against four
+image categories chosen to stress different extraction behaviors:
+  - photograph: smooth gradients, many similar colors near the Delta-E threshold.
+  - logo/graphic: a handful of flat, well-separated colors (the easy case).
+  - painting: a multi-color blend, exercising k-means cluster separation.
+  - near-monochrome (fog/snow): almost no color variation, exercising the
+    single/near-single-color fallback path.
 
 These tests exercise `_extract_palette` directly (PIL in, hex list out) since
 the full node's `extract()` requires torch, which is only present inside a

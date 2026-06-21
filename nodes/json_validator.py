@@ -34,8 +34,17 @@ _BBOX_RE = re.compile(r"bbox\s*=\s*\[([^\]]*)\]", re.IGNORECASE)
 def _extract_bbox_coords(element):
     """Collect numeric bbox coordinates from an element.
 
-    Handles both a structured `bbox` list field and the bible's text convention
-    of `bbox=[x_min,y_min,x_max,y_max]` embedded in the `desc` string.
+    An element's bounding box may be expressed in one of two equivalent forms:
+      - a structured `bbox` field: a 4-item list `[x_min, y_min, x_max, y_max]`.
+      - an inline token embedded in the free-text `desc` field, written as
+        `bbox=[x_min, y_min, x_max, y_max]` (e.g.
+        `desc="a red mug bbox=[100,200,300,400]"`).
+
+    Both forms are accepted because Ideogram 4 prompts are sometimes authored by
+    hand, where the inline `desc` form is faster to type than adding a separate
+    structured field. This function checks whichever form a given element
+    actually uses, so hand-written and machine-generated prompts validate the
+    same way.
     """
     coords = []
     bbox_field = element.get("bbox")
