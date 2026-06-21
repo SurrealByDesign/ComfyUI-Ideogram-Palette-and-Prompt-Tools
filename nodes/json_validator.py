@@ -35,16 +35,18 @@ def _extract_bbox_coords(element):
     """Collect numeric bbox coordinates from an element.
 
     An element's bounding box may be expressed in one of two equivalent forms:
-      - a structured `bbox` field: a 4-item list `[x_min, y_min, x_max, y_max]`.
+      - a structured `bbox` field: a 4-item list `[ymin, xmin, ymax, xmax]`
+        (the order the official Ideogram 4 element schema specifies).
       - an inline token embedded in the free-text `desc` field, written as
-        `bbox=[x_min, y_min, x_max, y_max]` (e.g.
+        `bbox=[ymin, xmin, ymax, xmax]` (e.g.
         `desc="a red mug bbox=[100,200,300,400]"`).
 
     Both forms are accepted because Ideogram 4 prompts are sometimes authored by
     hand, where the inline `desc` form is faster to type than adding a separate
     structured field. This function checks whichever form a given element
     actually uses, so hand-written and machine-generated prompts validate the
-    same way.
+    same way. The coordinate order does not affect this check itself — it only
+    range-tests each coordinate against 0-1000 regardless of position.
     """
     coords = []
     bbox_field = element.get("bbox")
