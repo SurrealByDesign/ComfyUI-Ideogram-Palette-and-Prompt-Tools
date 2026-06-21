@@ -33,22 +33,25 @@ a mismatched build.
 
 Tests are plain scripts (no pytest dependency) — run any of them directly:
 ```
-python tests/test_palette_blend.py
+python tests/test_color_utils.py
 ```
 
-They split into two groups:
+They split into two groups. The split is by what the test transitively
+imports, not just what it imports directly — several of these import a
+`nodes/*.py` module that imports `torch` itself, so the test file doesn't
+need to mention `torch` to require it.
 
 **Torch-free** — run in any Python with `Pillow`, `numpy`, and
 `scikit-learn`:
-`test_color_utils.py`, `test_element_builder.py`, `test_extractor.py`,
-`test_json_validator.py`, `test_metadata_reader.py`, `test_palette_blend.py`,
-`test_palette_override.py`, `test_palette_to_json.py`, `test_prompt_assembler.py`.
+`test_color_utils.py`, `test_element_builder.py`, `test_json_validator.py`,
+`test_metadata_reader.py`, `test_palette_to_json.py`, `test_prompt_assembler.py`.
 
 **Require `torch`** (run with ComfyUI's Python — see above):
-`test_masked_palette_extractor.py`, `test_metadata_embedder.py`,
-`test_metadata_file_reader.py`, `test_vibrant_palette_extractor.py`, and
-`test_workflows.py` (it imports the full node package, which pulls in
-`torch` transitively even though the test file itself doesn't import it).
+`test_extractor.py`, `test_masked_palette_extractor.py`,
+`test_metadata_embedder.py`, `test_metadata_file_reader.py`,
+`test_palette_blend.py`, `test_palette_override.py`,
+`test_vibrant_palette_extractor.py`, and `test_workflows.py` (it imports
+the full node package, which pulls in `torch` transitively).
 
 If you change anything under `nodes/` or `utils/`, run at minimum the tests
 for the file(s) you touched. If you change a workflow JSON under

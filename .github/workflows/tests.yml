@@ -26,7 +26,7 @@ jobs:
       - name: Run torch-free tests
         run: |
           set -e
-          for f in tests/test_color_utils.py tests/test_element_builder.py tests/test_extractor.py tests/test_json_validator.py tests/test_metadata_reader.py tests/test_palette_blend.py tests/test_palette_override.py tests/test_palette_to_json.py tests/test_prompt_assembler.py; do
+          for f in tests/test_color_utils.py tests/test_element_builder.py tests/test_json_validator.py tests/test_metadata_reader.py tests/test_palette_to_json.py tests/test_prompt_assembler.py; do
             echo "::group::$f"
             python "$f"
             echo "::endgroup::"
@@ -55,7 +55,7 @@ jobs:
       - name: Run torch-required tests
         run: |
           set -e
-          for f in tests/test_masked_palette_extractor.py tests/test_metadata_embedder.py tests/test_metadata_file_reader.py tests/test_vibrant_palette_extractor.py tests/test_workflows.py; do
+          for f in tests/test_extractor.py tests/test_masked_palette_extractor.py tests/test_metadata_embedder.py tests/test_metadata_file_reader.py tests/test_palette_blend.py tests/test_palette_override.py tests/test_vibrant_palette_extractor.py tests/test_workflows.py; do
             echo "::group::$f"
             python "$f"
             echo "::endgroup::"

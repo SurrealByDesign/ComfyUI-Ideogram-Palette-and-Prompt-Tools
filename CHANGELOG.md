@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `.github/workflows/tests.yml` — CI running the torch-free tests on a Python 3.10-3.12 matrix and the torch-required tests with a CI-only CPU `torch` install, plus a Tests status badge in the README.
+
+### Fixed
+- Corrected the torch-free/torch-required test split in `CONTRIBUTING.md` and the new CI workflow. `test_extractor.py`, `test_palette_blend.py`, and `test_palette_override.py` were miscategorized as torch-free — each imports a `nodes/*.py` module that imports `torch` unconditionally, so they need it transitively even though the test file itself never mentions `torch`. The first CI run caught this immediately (it had previously gone unnoticed because every local dev environment used in this project already had torch installed). The split is now empirically verified by running each test with `torch` import-blocked.
+
 <!--
 When cutting a release, move the relevant entries above into a new dated
 section below, then leave this Unreleased section with empty category
