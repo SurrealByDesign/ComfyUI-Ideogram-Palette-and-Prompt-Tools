@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - `pytest.ini` with `consider_namespace_packages = true`, fixing `pytest`/`pytest tests/` collection, which previously failed with `ImportError: attempted relative import with no known parent package`. Root cause: pytest's package-collection walk tried to import the repo-root `__init__.py` (ComfyUI's node-registration entry point) and couldn't build a valid package name for it because this repo's directory name contains hyphens; `--import-mode=importlib` alone did not fix this, `consider_namespace_packages = true` does. Verified with a clean directory-name A/B test to rule out a false-positive fix. `pytest` now passes all 102 test functions across all 14 files.
+- `assets/palette_batch_example.png` and a README example under Palette studies showing a real `tools/palette_batch.py` run: the same forest-path workflow and seed, run once per reference under `tests/test_images/` (logo, monochrome, painting, photograph), each producing a genuinely different extracted palette and recolored output. This was the one previously-untested code path in the project; the run confirmed auto-detection of the seed/prompt nodes, manifest generation, and graceful handling of a degenerate single-color extraction (the monochrome reference) all work correctly end-to-end against a live ComfyUI server.
 
 ### Changed
 - `CONTRIBUTING.md`'s Running Tests and PR process sections updated to reflect that `pytest` now works (previously documented as actively broken).

@@ -281,6 +281,18 @@ seed** — not a single batched run. Two ways to do it:
   a textual palette hint when it's plain text. Run it with a Python that can
   reach your ComfyUI server (e.g. the embedded `python_embeded\python.exe`).
 
+  A real run against the four images under [`tests/test_images/`](tests/test_images/)
+  — chosen for genuinely different palette characteristics (a flat-color logo, a
+  near-monochrome scene, a multi-color painting, and a photograph-like gradient) —
+  with the prompt and seed both held fixed:
+
+  ![tools/palette_batch.py example: one forest-path workflow run four times, once per reference image, each producing a different extracted palette and a differently recolored output](assets/palette_batch_example.png)
+
+  The single-color monochrome reference is the interesting case: a degenerate
+  one-color extraction doesn't crash the batch, it just produces a correspondingly
+  desaturated result — the same graceful-degradation behavior documented under
+  [Design notes](#design-notes).
+
 - **In-graph 3-way ([`workflows/palette_study_3way_workflow.json`](workflows/palette_study_3way_workflow.json))**
   — good for eyeballing 2–3 colorways live on the canvas. Three reference images
   each produce a `style_json`; wire each into its own copy of your
