@@ -1,0 +1,137 @@
+{
+  "last_node_id": 13,
+  "last_link_id": 11,
+  "nodes": [
+    {
+      "id": 1, "type": "LoadImage", "pos": [40, 60], "size": [240, 300], "flags": {}, "order": 0, "mode": 0,
+      "outputs": [
+        { "name": "IMAGE", "type": "IMAGE", "links": [1], "slot_index": 0 },
+        { "name": "MASK", "type": "MASK", "links": null }
+      ],
+      "widgets_values": ["region_a_reference.png", "image"], "title": "Region A reference"
+    },
+    {
+      "id": 2, "type": "LoadImage", "pos": [40, 400], "size": [240, 300], "flags": {}, "order": 1, "mode": 0,
+      "outputs": [
+        { "name": "IMAGE", "type": "IMAGE", "links": [2], "slot_index": 0 },
+        { "name": "MASK", "type": "MASK", "links": null }
+      ],
+      "widgets_values": ["region_b_reference.png", "image"], "title": "Region B reference"
+    },
+    {
+      "id": 3, "type": "IdeogramElementPalette", "pos": [320, 60], "size": [250, 110], "flags": {}, "order": 2, "mode": 0,
+      "inputs": [ { "name": "image", "type": "IMAGE", "link": 1 } ],
+      "outputs": [
+        { "name": "element_palette_json", "type": "STRING", "links": [3], "slot_index": 0 },
+        { "name": "palette_preview", "type": "IMAGE", "links": [5], "slot_index": 1 }
+      ],
+      "widgets_values": [5, 10.0], "title": "Region A palette (<=5)"
+    },
+    {
+      "id": 4, "type": "IdeogramElementPalette", "pos": [320, 400], "size": [250, 110], "flags": {}, "order": 3, "mode": 0,
+      "inputs": [ { "name": "image", "type": "IMAGE", "link": 2 } ],
+      "outputs": [
+        { "name": "element_palette_json", "type": "STRING", "links": [4], "slot_index": 0 },
+        { "name": "palette_preview", "type": "IMAGE", "links": [6], "slot_index": 1 }
+      ],
+      "widgets_values": [5, 10.0], "title": "Region B palette (<=5)"
+    },
+    {
+      "id": 5, "type": "IdeogramElementBuilder", "pos": [620, 40], "size": [290, 230], "flags": {}, "order": 4, "mode": 0,
+      "inputs": [
+        { "name": "color_palette", "type": "STRING", "link": 3, "widget": { "name": "color_palette" } }
+      ],
+      "outputs": [
+        { "name": "element_json", "type": "STRING", "links": [7], "slot_index": 0 },
+        { "name": "bbox_preview", "type": "STRING", "links": null, "slot_index": 1 }
+      ],
+      "widgets_values": ["obj", "the sky region across the top of the frame", 0, 0, 300, 1000, "", ""],
+      "title": "Element: sky (obj, Region A palette)"
+    },
+    {
+      "id": 6, "type": "IdeogramElementBuilder", "pos": [620, 320], "size": [290, 230], "flags": {}, "order": 5, "mode": 0,
+      "inputs": [
+        { "name": "color_palette", "type": "STRING", "link": 4, "widget": { "name": "color_palette" } }
+      ],
+      "outputs": [
+        { "name": "element_json", "type": "STRING", "links": [8], "slot_index": 0 },
+        { "name": "bbox_preview", "type": "STRING", "links": null, "slot_index": 1 }
+      ],
+      "widgets_values": ["obj", "the main subject in the lower center of the frame", 300, 300, 900, 700, "", ""],
+      "title": "Element: subject (obj, Region B palette)"
+    },
+    {
+      "id": 7, "type": "IdeogramElementBuilder", "pos": [620, 600], "size": [290, 230], "flags": {}, "order": 6, "mode": 0,
+      "inputs": [],
+      "outputs": [
+        { "name": "element_json", "type": "STRING", "links": [9], "slot_index": 0 },
+        { "name": "bbox_preview", "type": "STRING", "links": null, "slot_index": 1 }
+      ],
+      "widgets_values": ["text", "bold display title, high contrast", 50, 100, 150, 900, "", "TITLE"],
+      "title": "Element: title (text, no palette)"
+    },
+    {
+      "id": 8, "type": "IdeogramElementCollector", "pos": [960, 320], "size": [280, 200], "flags": {}, "order": 7, "mode": 0,
+      "inputs": [
+        { "name": "element_1", "type": "STRING", "link": 7 },
+        { "name": "element_2", "type": "STRING", "link": 8 },
+        { "name": "element_3", "type": "STRING", "link": 9 }
+      ],
+      "outputs": [
+        { "name": "compositional_json", "type": "STRING", "links": [10], "slot_index": 0 },
+        { "name": "element_count", "type": "INT", "links": null, "slot_index": 1 },
+        { "name": "overlap_warning", "type": "STRING", "links": [11], "slot_index": 2 }
+      ],
+      "widgets_values": ["a wide cinematic landscape at golden hour"],
+      "title": "Collect into compositional_deconstruction"
+    },
+    {
+      "id": 9, "type": "PreviewImage", "pos": [320, 200], "size": [250, 150], "flags": {}, "order": 8, "mode": 0,
+      "inputs": [ { "name": "images", "type": "IMAGE", "link": 5 } ], "outputs": [], "title": "Region A swatch"
+    },
+    {
+      "id": 10, "type": "PreviewImage", "pos": [320, 540], "size": [250, 150], "flags": {}, "order": 9, "mode": 0,
+      "inputs": [ { "name": "images", "type": "IMAGE", "link": 6 } ], "outputs": [], "title": "Region B swatch"
+    },
+    {
+      "id": 11, "type": "ShowText|pysssss", "pos": [1280, 300], "size": [420, 220], "flags": {}, "order": 10, "mode": 0,
+      "inputs": [ { "name": "text", "type": "STRING", "link": 10 } ],
+      "outputs": [ { "name": "STRING", "type": "STRING", "links": null } ],
+      "title": "compositional_deconstruction JSON (optional display)"
+    },
+    {
+      "id": 12, "type": "ShowText|pysssss", "pos": [1280, 560], "size": [420, 110], "flags": {}, "order": 11, "mode": 0,
+      "inputs": [ { "name": "text", "type": "STRING", "link": 11 } ],
+      "outputs": [ { "name": "STRING", "type": "STRING", "links": null } ],
+      "title": "overlap_warning (empty when text boxes don't overlap)"
+    },
+    {
+      "id": 13, "type": "Note", "pos": [40, -250], "size": [900, 200], "flags": {}, "order": 12, "mode": 0,
+      "properties": { "text": "" },
+      "widgets_values": ["PER-ELEMENT PALETTES -> COMPOSITIONAL DECONSTRUCTION\n\nEach region of one generation gets its own reference palette and its own placement.\n\n1) Two reference images each yield a <=5 color element palette (Ideogram Element Palette).\n2) Each palette feeds an Ideogram Element Builder as color_palette, paired with a bounding box ([ymin, xmin, ymax, xmax], 0-1000) and a description. A third builder adds a text overlay element (type 'text', no palette).\n3) Ideogram Element Collector gathers the three element JSON strings into one compositional_deconstruction block, and reports overlapping TEXT boxes (none here -- add a second overlapping text element to see the warning).\n\nThe compositional_deconstruction block is ready to drop into a full Ideogram 4 prompt. ShowText nodes are optional (ComfyUI-Custom-Scripts)."],
+      "color": "#432", "bgcolor": "#653", "title": "README"
+    }
+  ],
+  "links": [
+    [1, 1, 0, 3, 0, "IMAGE"],
+    [2, 2, 0, 4, 0, "IMAGE"],
+    [3, 3, 0, 5, 0, "STRING"],
+    [4, 4, 0, 6, 0, "STRING"],
+    [5, 3, 1, 9, 0, "IMAGE"],
+    [6, 4, 1, 10, 0, "IMAGE"],
+    [7, 5, 0, 8, 0, "STRING"],
+    [8, 6, 0, 8, 1, "STRING"],
+    [9, 7, 0, 8, 2, "STRING"],
+    [10, 8, 0, 11, 0, "STRING"],
+    [11, 8, 2, 12, 0, "STRING"]
+  ],
+  "groups": [
+    { "title": "Reference images -> per-region palettes", "bounding": [20, 0, 560, 710], "color": "#3f789e" },
+    { "title": "Build elements -> collect", "bounding": [600, 0, 660, 840], "color": "#a1309b" }
+  ],
+  "config": {},
+  "extra": {
+    "note": "PER-ELEMENT PALETTES: demonstrates IdeogramElementBuilder + IdeogramElementCollector. Two reference images each produce a <=5 color element palette (IdeogramElementPalette), each wired into an IdeogramElementBuilder's color_palette as the palette for one spatial region. A third builder adds a text overlay element with no palette. The collector assembles all three into a compositional_deconstruction block (background + elements) and reports overlapping text boxes. Boxes use [ymin, xmin, ymax, xmax], integers 0-1000. The block is ready to paste under 'compositional_deconstruction' in a full Ideogram 4 prompt. ShowText nodes are optional (ComfyUI-Custom-Scripts) and only display strings."
+  },
+  "version": 0.4
+}

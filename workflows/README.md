@@ -28,6 +28,7 @@ full breakdown of which nodes each one wires together.
 | [`showcase_03_vibrant_vs_frequency.json`](showcase_03_vibrant_vs_frequency.json) | Compare frequency ranking against three Vibrant Extractor modes. |
 | [`showcase_04_masked_subject_and_global.json`](showcase_04_masked_subject_and_global.json) | Region-accurate per-element palette (masked subject) alongside a global palette. |
 | [`showcase_05_embed_recover_roundtrip.json`](showcase_05_embed_recover_roundtrip.json) | Embed a prompt on save, then recover it from the saved PNG by path. |
+| [`showcase_06_per_element_palettes.json`](showcase_06_per_element_palettes.json) | Give each region its own reference palette and placement, assembled into a `compositional_deconstruction` block. |
 
 ## Validating changes
 

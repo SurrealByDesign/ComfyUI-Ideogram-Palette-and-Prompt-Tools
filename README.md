@@ -47,7 +47,7 @@ pip install scikit-learn
 The package also uses `torch`, `numpy`, and `Pillow`, but those ship with
 ComfyUI and are **deliberately not** listed in `requirements.txt` — reinstalling
 them (torch especially) can pull a build that doesn't match your ComfyUI/CUDA
-setup and break the install. After restarting, the twelve nodes appear in the
+setup and break the install. After restarting, the fourteen nodes appear in the
 node menu under **`Ideogram/Palette`**.
 
 ## Why This Exists
@@ -207,6 +207,30 @@ of `"{}"` lets it assemble a prompt from scratch.
 - **Inputs:** `base_json` (default `"{}"`), `merge_json`, `fix_key_order` (BOOLEAN, default True)
 - **Outputs:** `prompt_json` (merged, key-ordered), `report` (what was merged)
 
+### Ideogram Element Builder (`IdeogramElementBuilder`)
+Builds a single Ideogram 4 `compositional_deconstruction` element from individual
+inputs — a bounding box, a description, an element type, and an optional
+per-element palette (e.g. from `IdeogramElementPalette`, wired into
+`color_palette`). Wire several builders in parallel into `IdeogramElementCollector`
+so each region of a generation can carry its own spatial placement and its own
+reference palette. Boxes are emitted as `[ymin, xmin, ymax, xmax]` (the official
+element schema order); out-of-range values are clamped, inverted edges are
+swapped, and malformed palettes are omitted rather than crashing.
+
+- **Inputs:** `element_type` (`obj` / `text`, default `obj`), `description`, `bbox_ymin`/`bbox_xmin`/`bbox_ymax`/`bbox_xmax` (INT 0-1000), optional `color_palette` (JSON hex array string, max 5), optional `text_content` (used only when `element_type` is `text`)
+- **Outputs:** `element_json` (one element JSON object), `bbox_preview` (summary + any warnings)
+
+### Ideogram Element Collector (`IdeogramElementCollector`)
+Collects between 1 and 8 element JSON strings from `IdeogramElementBuilder`
+instances into a complete `compositional_deconstruction` block with a background
+description. Empty inputs are skipped, malformed elements are dropped with a
+console warning, and overlapping **text** element boxes are reported (overlapping
+text renders poorly in Ideogram 4). Solves ComfyUI's lack of a native way to
+collect a variable number of string outputs into a list.
+
+- **Inputs:** `background`, `element_1` (required) through `element_8` (optional)
+- **Outputs:** `compositional_json` (complete block), `element_count` (INT), `overlap_warning` (empty if none)
+
 ## Example workflow
 
 [`workflows/palette_reference_workflow.json`](workflows/palette_reference_workflow.json)
@@ -255,7 +279,7 @@ seed** — not a single batched run. Two ways to do it:
 
 ## Showcase workflows
 
-A set of five ready-to-load workflows under [`workflows/`](workflows/) that
+A set of six ready-to-load workflows under [`workflows/`](workflows/) that
 demonstrate the nodes working together, from a single extraction up to a full
 extract → assemble → validate → embed pipeline. Load any of them via ComfyUI's
 **Workflow → Open** menu and point the `LoadImage` node(s) at your own reference.
@@ -267,6 +291,7 @@ extract → assemble → validate → embed pipeline. Load any of them via Comfy
 | [`showcase_03_vibrant_vs_frequency.json`](workflows/showcase_03_vibrant_vs_frequency.json) | Same image, four rankings side by side — the default frequency extractor vs. the Vibrant Extractor in `vibrant` / `muted` / `dark_vibrant` modes. | Extractor + 3× Vibrant Extractor → Palette→Global JSON |
 | [`showcase_04_masked_subject_and_global.json`](workflows/showcase_04_masked_subject_and_global.json) | Build a structured prompt with **two** palettes: a region-accurate per-element palette from a masked subject, plus the global palette from the whole frame. | Masked Extractor → Override (≤5) ‖ Element Palette ‖ Extractor → Palette→Global JSON |
 | [`showcase_05_embed_recover_roundtrip.json`](workflows/showcase_05_embed_recover_roundtrip.json) | The metadata loop closing: embed a prompt on save, then recover it from the saved PNG by path (and why the tensor-based reader can't). | Extractor → Palette→Global JSON → Prompt Assembler → Metadata Embedder … Load Image With Prompt → JSON Validator (+ Metadata Reader caveat) |
+| [`showcase_06_per_element_palettes.json`](workflows/showcase_06_per_element_palettes.json) | Give each region of one generation its own reference palette and placement, assembled into a `compositional_deconstruction` block. | 2× Element Palette → 2× Element Builder ‖ Element Builder (text) → Element Collector |
 
 A few notes that apply across the set:
 
