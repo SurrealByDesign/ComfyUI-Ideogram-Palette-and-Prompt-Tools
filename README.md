@@ -220,6 +220,11 @@ swapped, and malformed palettes are omitted rather than crashing.
 - **Inputs:** `element_type` (`obj` / `text`, default `obj`), `description`, `bbox_ymin`/`bbox_xmin`/`bbox_ymax`/`bbox_xmax` (INT 0-1000), optional `color_palette` (JSON hex array string, max 5), optional `text_content` (used only when `element_type` is `text`)
 - **Outputs:** `element_json` (one element JSON object), `bbox_preview` (summary + any warnings)
 
+Each region of a scene becomes its own element — a bounding box plus a palette
+extracted from that region's pixels:
+
+![Element builder example: a scene split into sky, valley, traveler, and foreground rock regions, each with its own bounding box and extracted color palette](assets/element_builder_example.png)
+
 ### Ideogram Element Collector (`IdeogramElementCollector`)
 Collects between 1 and 8 element JSON strings from `IdeogramElementBuilder`
 instances into a complete `compositional_deconstruction` block with a background
