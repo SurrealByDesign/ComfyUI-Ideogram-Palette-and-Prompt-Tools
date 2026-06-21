@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `pytest.ini` with `consider_namespace_packages = true`, fixing `pytest`/`pytest tests/` collection, which previously failed with `ImportError: attempted relative import with no known parent package`. Root cause: pytest's package-collection walk tried to import the repo-root `__init__.py` (ComfyUI's node-registration entry point) and couldn't build a valid package name for it because this repo's directory name contains hyphens; `--import-mode=importlib` alone did not fix this, `consider_namespace_packages = true` does. Verified with a clean directory-name A/B test to rule out a false-positive fix. `pytest` now passes all 102 test functions across all 14 files.
+
+### Changed
+- `CONTRIBUTING.md`'s Running Tests and PR process sections updated to reflect that `pytest` now works (previously documented as actively broken).
+
 <!--
 When cutting a release, move the relevant entries above into a new dated
 section below, then leave this Unreleased section with empty category

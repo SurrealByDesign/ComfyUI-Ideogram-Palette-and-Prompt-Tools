@@ -36,16 +36,18 @@ Tests are plain scripts (no pytest dependency) — run any of them directly:
 python tests/test_color_utils.py
 ```
 
-**Don't run bare `pytest` from the repo root** — it currently fails during
-collection with `ImportError: attempted relative import with no known parent
-package`, triggered by the root `__init__.py`'s relative imports (that file
-is ComfyUI's required node-registration entry point, not a test artifact,
-but pytest's rootdir/package detection tries to import it anyway).
-`--import-mode=importlib` does not fix this. `python -m unittest discover`
-doesn't error, but silently finds and runs zero tests (these are plain
-`assert`-based functions, not `unittest.TestCase` subclasses) — worse than
-an honest failure. Run each test as a script via the commands above until
-this is resolved.
+If you have `pytest` installed, `pytest` (or `pytest tests/`) also works and
+runs all 102 test functions across all 14 files. This needs the
+`consider_namespace_packages = true` setting in `pytest.ini` — without it,
+collection fails with `ImportError: attempted relative import with no known
+parent package`, because pytest's package-collection walk tries to import
+the repo-root `__init__.py` (ComfyUI's required node-registration entry
+point, not a test artifact) and can't build a valid package name for it
+(this repo's directory name contains hyphens). `--import-mode=importlib`
+alone does not fix this; the `pytest.ini` setting does. `python -m unittest
+discover` doesn't error, but silently finds and runs zero tests (these are
+plain `assert`-based functions, not `unittest.TestCase` subclasses) — don't
+use it.
 
 They split into two groups. The split is by what the test transitively
 imports, not just what it imports directly — several of these import a
@@ -102,11 +104,11 @@ by hand:
   or adding a node.
 - CI (`.github/workflows/tests.yml`) runs automatically on every push and PR
   and covers all 14 test files, split across a torch-free job and a
-  torch-required job — but it only runs the script-style invocations
-  documented above, not `pytest` (this repo's tests aren't currently
-  pytest-compatible; see the note in Running Tests). Still report what you
-  ran locally in the PR description — CI is a backstop, not a replacement
-  for you actually having run the tests yourself.
+  torch-required job, via the script-style invocations documented above
+  (not `pytest`, even though `pytest` itself now works too — see Running
+  Tests). Still report what you ran locally in the PR description — CI is
+  a backstop, not a replacement for you actually having run the tests
+  yourself.
 
 ## Reporting issues
 
