@@ -1,14 +1,66 @@
 # ComfyUI-Ideogram-Palette-and-Prompt-Tools
 
+*Pick the palette. Skip the hex-code spreadsheet.*
+
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 ![ComfyUI custom nodes](https://img.shields.io/badge/ComfyUI-custom%20nodes-6f42c1.svg)
-![Dependencies: none extra](https://img.shields.io/badge/extra%20deps-none-brightgreen.svg)
+![Extra dependency: scikit-learn](https://img.shields.io/badge/extra%20dep-scikit--learn-orange.svg)
 
 A ComfyUI toolkit for Ideogram 4's structured prompt JSON, built around color
 palette extraction: pull palettes from reference images, assemble and validate
 the full Ideogram JSON, and embed/recover prompts from generated images — all
 as composable nodes that wire into a ComfyUI generation workflow.
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Why This Exists](#why-this-exists)
+- [What it does](#what-it-does)
+- [Nodes](#nodes)
+- [Example workflow](#example-workflow)
+- [Palette studies (same image, different palettes)](#palette-studies-same-image-different-palettes)
+- [Showcase workflows](#showcase-workflows)
+- [Design notes](#design-notes)
+- [Testing](#testing)
+- [License](#license)
+
+## Installation
+
+Clone (or copy) this repository into your ComfyUI `custom_nodes/` directory and
+restart ComfyUI:
+
+```
+cd ComfyUI/custom_nodes
+git clone https://github.com/SurrealByDesign/ComfyUI-Ideogram-Palette-and-Prompt-Tools
+```
+
+The only extra dependency is **scikit-learn** (used for k-means clustering),
+which is not part of a base ComfyUI install. ComfyUI-Manager installs it
+automatically from [`requirements.txt`](requirements.txt); to install it by
+hand into ComfyUI's Python:
+
+```
+pip install scikit-learn
+```
+
+The package also uses `torch`, `numpy`, and `Pillow`, but those ship with
+ComfyUI and are **deliberately not** listed in `requirements.txt` — reinstalling
+them (torch especially) can pull a build that doesn't match your ComfyUI/CUDA
+setup and break the install. After restarting, the twelve nodes appear in the
+node menu under **`Ideogram/Palette`**.
+
+## Why This Exists
+
+Ideogram 4's most powerful prompting feature — structured JSON prompts with
+explicit, ordered color palettes — is also the most tedious to use by hand:
+picking a dozen consistent hex codes, getting the nested JSON key order right,
+and keeping per-element palettes within Ideogram's limits is easy to get
+wrong. This toolkit automates that part of the process — extract a palette
+directly from a reference image, validate and assemble it into the exact JSON
+shape Ideogram expects, and round-trip the prompt through your saved images —
+so the creative decision stays in ComfyUI's node graph instead of a text
+editor.
 
 ## What it does
 
@@ -222,31 +274,6 @@ A few notes that apply across the set:
   deliberately stop at `style_json` so they stay backend-agnostic.
 - Workflow 05 has two halves — run **Part A first** so it writes the PNG that
   **Part B** then loads back by path.
-
-## Installation
-
-Clone (or copy) this repository into your ComfyUI `custom_nodes/` directory and
-restart ComfyUI:
-
-```
-cd ComfyUI/custom_nodes
-git clone https://github.com/SurrealByDesign/ComfyUI-Ideogram-Palette-and-Prompt-Tools
-```
-
-The only extra dependency is **scikit-learn** (used for k-means clustering),
-which is not part of a base ComfyUI install. ComfyUI-Manager installs it
-automatically from [`requirements.txt`](requirements.txt); to install it by
-hand into ComfyUI's Python:
-
-```
-pip install scikit-learn
-```
-
-The package also uses `torch`, `numpy`, and `Pillow`, but those ship with
-ComfyUI and are **deliberately not** listed in `requirements.txt` — reinstalling
-them (torch especially) can pull a build that doesn't match your ComfyUI/CUDA
-setup and break the install. After restarting, the twelve nodes appear in the
-node menu under **`Ideogram/Palette`**.
 
 ## Design notes
 
