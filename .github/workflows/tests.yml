@@ -1,0 +1,62 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  torch-free:
+    name: torch-free tests (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: pip install numpy Pillow scikit-learn
+
+      - name: Run torch-free tests
+        run: |
+          set -e
+          for f in tests/test_color_utils.py tests/test_element_builder.py tests/test_extractor.py tests/test_json_validator.py tests/test_metadata_reader.py tests/test_palette_blend.py tests/test_palette_override.py tests/test_palette_to_json.py tests/test_prompt_assembler.py; do
+            echo "::group::$f"
+            python "$f"
+            echo "::endgroup::"
+          done
+
+  torch-required:
+    name: torch-required tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # CPU-only torch is a CI-only test dependency. It must never be added to
+      # requirements.txt -- ComfyUI-Manager installs that file automatically,
+      # and a separately pip-installed torch can mismatch a user's actual
+      # ComfyUI/CUDA setup and break their install. These nodes import torch
+      # for IMAGE/MASK tensor handling, which is why this job needs it at all.
+      - name: Install dependencies (CI-only CPU torch)
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install numpy Pillow scikit-learn
+
+      - name: Run torch-required tests
+        run: |
+          set -e
+          for f in tests/test_masked_palette_extractor.py tests/test_metadata_embedder.py tests/test_metadata_file_reader.py tests/test_vibrant_palette_extractor.py tests/test_workflows.py; do
+            echo "::group::$f"
+            python "$f"
+            echo "::endgroup::"
+          done

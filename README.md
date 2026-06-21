@@ -2,6 +2,7 @@
 
 *Pick the palette. Skip the hex-code spreadsheet.*
 
+![Tests](https://github.com/SurrealByDesign/ComfyUI-Ideogram-Palette-and-Prompt-Tools/actions/workflows/tests.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 ![ComfyUI custom nodes](https://img.shields.io/badge/ComfyUI-custom%20nodes-6f42c1.svg)
