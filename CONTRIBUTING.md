@@ -36,6 +36,17 @@ Tests are plain scripts (no pytest dependency) — run any of them directly:
 python tests/test_color_utils.py
 ```
 
+**Don't run bare `pytest` from the repo root** — it currently fails during
+collection with `ImportError: attempted relative import with no known parent
+package`, triggered by the root `__init__.py`'s relative imports (that file
+is ComfyUI's required node-registration entry point, not a test artifact,
+but pytest's rootdir/package detection tries to import it anyway).
+`--import-mode=importlib` does not fix this. `python -m unittest discover`
+doesn't error, but silently finds and runs zero tests (these are plain
+`assert`-based functions, not `unittest.TestCase` subclasses) — worse than
+an honest failure. Run each test as a script via the commands above until
+this is resolved.
+
 They split into two groups. The split is by what the test transitively
 imports, not just what it imports directly — several of these import a
 `nodes/*.py` module that imports `torch` itself, so the test file doesn't
@@ -88,8 +99,13 @@ by hand:
   change, following [Keep a Changelog](https://keepachangelog.com/) style.
 - Update `README.md` if you're changing documented behavior, inputs/outputs,
   or adding a node.
-- There's no CI configured yet, so the test run you report is the only
-  signal the maintainer has — please be thorough.
+- CI (`.github/workflows/tests.yml`) runs automatically on every push and PR
+  and covers all 14 test files, split across a torch-free job and a
+  torch-required job — but it only runs the script-style invocations
+  documented above, not `pytest` (this repo's tests aren't currently
+  pytest-compatible; see the note in Running Tests). Still report what you
+  ran locally in the PR description — CI is a backstop, not a replacement
+  for you actually having run the tests yourself.
 
 ## Reporting issues
 

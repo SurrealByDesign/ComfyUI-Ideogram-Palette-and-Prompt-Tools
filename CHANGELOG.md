@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Corrected the torch-free/torch-required test split in `CONTRIBUTING.md` and the new CI workflow. `test_extractor.py`, `test_palette_blend.py`, and `test_palette_override.py` were miscategorized as torch-free — each imports a `nodes/*.py` module that imports `torch` unconditionally, so they need it transitively even though the test file itself never mentions `torch`. The first CI run caught this immediately (it had previously gone unnoticed because every local dev environment used in this project already had torch installed). The split is now empirically verified by running each test with `torch` import-blocked.
+- `CONTRIBUTING.md`'s PR process section said "there's no CI configured yet" — stale since the CI workflow above was added. Also documents that bare `pytest` currently fails to collect this repo's tests (a real, reproducible `ImportError` from the root `__init__.py`'s relative imports, confirmed not fixed by `--import-mode=importlib`), so contributors aren't surprised by it.
 
 <!--
 When cutting a release, move the relevant entries above into a new dated
