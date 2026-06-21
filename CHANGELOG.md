@@ -7,15 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- `.github/workflows/tests.yml` — CI running the torch-free tests on a Python 3.10-3.12 matrix and the torch-required tests with a CI-only CPU `torch` install, plus a Tests status badge in the README.
-- Two tests in `test_metadata_reader.py` covering `IdeogramMetadataReader.read()` itself (previously only the private `_lookup_metadata` helper was tested): one demonstrating that a real IMAGE tensor always loses its metadata through the tensor-to-PIL conversion (the README's documented limitation, now actually exercised), and one confirming `read()` degrades gracefully on bad input instead of raising. This moves `test_metadata_reader.py` from the torch-free to the torch-required group, since building a real tensor needs `torch`.
-- `dependencies = ["scikit-learn"]` to `pyproject.toml`'s `[project]` table — the registry reads this PEP 621 field directly (not `requirements.txt`), so it was previously showing an empty dependency list for the published package.
-
-### Fixed
-- Corrected the torch-free/torch-required test split in `CONTRIBUTING.md` and the new CI workflow. `test_extractor.py`, `test_palette_blend.py`, and `test_palette_override.py` were miscategorized as torch-free — each imports a `nodes/*.py` module that imports `torch` unconditionally, so they need it transitively even though the test file itself never mentions `torch`. The first CI run caught this immediately (it had previously gone unnoticed because every local dev environment used in this project already had torch installed). The split is now empirically verified by running each test with `torch` import-blocked.
-- `CONTRIBUTING.md`'s PR process section said "there's no CI configured yet" — stale since the CI workflow above was added. Also documents that bare `pytest` currently fails to collect this repo's tests (a real, reproducible `ImportError` from the root `__init__.py`'s relative imports, confirmed not fixed by `--import-mode=importlib`), so contributors aren't surprised by it.
-
 <!--
 When cutting a release, move the relevant entries above into a new dated
 section below, then leave this Unreleased section with empty category
@@ -28,6 +19,18 @@ headers ready for the next round of changes:
 ### Fixed
 ### Security
 -->
+
+## [1.1.1] - 2026-06-21
+
+### Added
+- `.github/workflows/tests.yml` — CI running the torch-free tests on a Python 3.10-3.12 matrix and the torch-required tests with a CI-only CPU `torch` install, plus a Tests status badge in the README.
+- Two tests in `test_metadata_reader.py` covering `IdeogramMetadataReader.read()` itself (previously only the private `_lookup_metadata` helper was tested): one demonstrating that a real IMAGE tensor always loses its metadata through the tensor-to-PIL conversion (the README's documented limitation, now actually exercised), and one confirming `read()` degrades gracefully on bad input instead of raising. This moves `test_metadata_reader.py` from the torch-free to the torch-required group, since building a real tensor needs `torch`.
+- `dependencies = ["scikit-learn"]` to `pyproject.toml`'s `[project]` table — the registry reads this PEP 621 field directly (not `requirements.txt`), so it was previously showing an empty dependency list for the published package.
+
+### Fixed
+- Corrected the torch-free/torch-required test split in `CONTRIBUTING.md` and the new CI workflow. `test_extractor.py`, `test_palette_blend.py`, and `test_palette_override.py` were miscategorized as torch-free — each imports a `nodes/*.py` module that imports `torch` unconditionally, so they need it transitively even though the test file itself never mentions `torch`. The first CI run caught this immediately (it had previously gone unnoticed because every local dev environment used in this project already had torch installed). The split is now empirically verified by running each test with `torch` import-blocked.
+- `CONTRIBUTING.md`'s PR process section said "there's no CI configured yet" — stale since the CI workflow above was added. Also documents that bare `pytest` currently fails to collect this repo's tests (a real, reproducible `ImportError` from the root `__init__.py`'s relative imports, confirmed not fixed by `--import-mode=importlib`), so contributors aren't surprised by it.
+- The published `v1.1.0` registry artifact didn't match the `v1.1.0` git tag — 3 commits (CI workflow, the test-split fix, and registry publishing setup) landed after the tag without a version bump, so `git checkout v1.1.0` didn't reproduce what was actually live on the registry. This release closes that gap; going forward, `pyproject.toml`'s version is only bumped at the same time as a tag.
 
 ## [1.1.0] - 2026-06-21
 
@@ -58,6 +61,7 @@ headers ready for the next round of changes:
 - PNG metadata embed/recover nodes.
 - A showcase set of five example workflows.
 
-[Unreleased]: https://github.com/SurrealByDesign/ComfyUI-Ideogram-Palette-and-Prompt-Tools/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/SurrealByDesign/ComfyUI-Ideogram-Palette-and-Prompt-Tools/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/SurrealByDesign/ComfyUI-Ideogram-Palette-and-Prompt-Tools/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/SurrealByDesign/ComfyUI-Ideogram-Palette-and-Prompt-Tools/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/SurrealByDesign/ComfyUI-Ideogram-Palette-and-Prompt-Tools/releases/tag/v1.0.0
