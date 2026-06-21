@@ -79,9 +79,16 @@ each block — the same value Ideogram consumes):
 
 Because the palette is injected into the prompt conditioning, swapping it while
 holding the seed and prompt fixed recolors the same scene — useful for colorway
-studies:
+studies. The same forest path, trees, and lake render five distinct moods below,
+with only `style_description.color_palette` changing between renders:
 
-![Colorway study: same seed and prompt, palette swapped per reference](assets/colorway_study.png)
+![Colorway study: same seed and prompt, palette swapped per variant — warm, cool, vibrant, muted, and fantasy palettes applied to an identical forest path scene](assets/colorway_study.png)
+
+The same technique applies to any composition — a second scene (a cottage
+courtyard) shows the same five-palette swap holding an entirely different
+subject fixed instead:
+
+![Garden courtyard palette study: same seed and prompt, palette swapped per variant — warm, cool, vibrant, muted, and fantasy palettes applied to an identical courtyard scene](assets/garden_courtyard_palettes.png)
 
 ## Nodes
 
