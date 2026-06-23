@@ -94,7 +94,12 @@ class IdeogramJSONValidator:
     Outputs:
         prompt_json: the validated and optionally key-reordered JSON string.
         is_valid: False if any errors (or, in strict_mode, any warnings) were found.
-        report: a human-readable validation summary.
+        report: a human-readable validation summary (same content as before --
+            unchanged for backward compatibility with anything parsing it).
+        errors_json: a JSON array of error message strings (possibly empty),
+            for consumers that need structured data instead of re-parsing
+            `report`'s prose.
+        warnings_json: a JSON array of warning message strings (possibly empty).
     """
 
     @classmethod
@@ -107,8 +112,12 @@ class IdeogramJSONValidator:
             }
         }
 
-    RETURN_TYPES = ("STRING", "BOOLEAN", "STRING")
-    RETURN_NAMES = ("prompt_json", "is_valid", "report")
+    # errors_json/warnings_json were added after prompt_json/is_valid/report
+    # shipped in v1.0.0 -- appended at the end, not inserted, so existing
+    # saved workflows' connections to the original three outputs (which
+    # ComfyUI resolves by index) keep working unchanged.
+    RETURN_TYPES = ("STRING", "BOOLEAN", "STRING", "STRING", "STRING")
+    RETURN_NAMES = ("prompt_json", "is_valid", "report", "errors_json", "warnings_json")
     FUNCTION = "validate"
     CATEGORY = "Ideogram/Palette"
 
@@ -120,12 +129,14 @@ class IdeogramJSONValidator:
             try:
                 data = json.loads(prompt_json)
             except (json.JSONDecodeError, TypeError) as e:
-                report = _build_report(False, [f"invalid JSON: {e}"], [])
-                return (prompt_json, False, report)
+                errors = [f"invalid JSON: {e}"]
+                report = _build_report(False, errors, [])
+                return (prompt_json, False, report, json.dumps(errors, ensure_ascii=False), "[]")
 
             if not isinstance(data, dict):
-                report = _build_report(False, ["top-level JSON is not an object"], [])
-                return (prompt_json, False, report)
+                errors = ["top-level JSON is not an object"]
+                report = _build_report(False, errors, [])
+                return (prompt_json, False, report, json.dumps(errors, ensure_ascii=False), "[]")
 
             # 2. Presence of the three top-level keys (missing -> warning).
             for key in TOP_LEVEL_KEY_ORDER:
@@ -178,11 +189,12 @@ class IdeogramJSONValidator:
             is_valid = len(errors) == 0 and (not strict_mode or len(warnings) == 0)
 
             # 10. Output: reordered JSON when fixing, otherwise the untouched original.
-            out_json = json.dumps(data) if fix_key_order else prompt_json
+            out_json = json.dumps(data, ensure_ascii=False) if fix_key_order else prompt_json
             report = _build_report(is_valid, errors, warnings)
-            return (out_json, is_valid, report)
+            return (out_json, is_valid, report, json.dumps(errors, ensure_ascii=False), json.dumps(warnings, ensure_ascii=False))
 
         except Exception as e:
             # 11. Never crash.
-            report = _build_report(False, [f"unexpected error: {e}"], [])
-            return (prompt_json, False, report)
+            errors = [f"unexpected error: {e}"]
+            report = _build_report(False, errors, [])
+            return (prompt_json, False, report, json.dumps(errors), "[]")

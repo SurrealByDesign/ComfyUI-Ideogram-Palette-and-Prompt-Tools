@@ -13,6 +13,7 @@ from .nodes.metadata_file_reader import IdeogramLoadImageWithPrompt
 from .nodes.masked_palette_extractor import IdeogramMaskedPaletteExtractor
 from .nodes.vibrant_palette_extractor import IdeogramVibrantPaletteExtractor
 from .nodes.element_builder import IdeogramElementBuilder, IdeogramElementCollector
+from .nodes.visual_prompt_designer import IdeogramVisualPromptDesigner
 
 NODE_CLASS_MAPPINGS = {
     "IdeogramPaletteExtractor": IdeogramPaletteExtractor,
@@ -29,6 +30,7 @@ NODE_CLASS_MAPPINGS = {
     "IdeogramVibrantPaletteExtractor": IdeogramVibrantPaletteExtractor,
     "IdeogramElementBuilder": IdeogramElementBuilder,
     "IdeogramElementCollector": IdeogramElementCollector,
+    "IdeogramVisualPromptDesigner": IdeogramVisualPromptDesigner,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -46,6 +48,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "IdeogramVibrantPaletteExtractor": "Ideogram Vibrant Palette Extractor",
     "IdeogramElementBuilder": "Ideogram Element Builder",
     "IdeogramElementCollector": "Ideogram Element Collector",
+    "IdeogramVisualPromptDesigner": "Ideogram Visual Prompt Designer",
 }
 
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]

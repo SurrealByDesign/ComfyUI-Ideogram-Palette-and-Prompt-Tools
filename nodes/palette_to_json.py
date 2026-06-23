@@ -65,4 +65,4 @@ class IdeogramPaletteToGlobalJSON:
                 "color_palette": list(FALLBACK_PALETTE),
             }
 
-        return (json.dumps({"style_description": style_description}),)
+        return (json.dumps({"style_description": style_description}, ensure_ascii=False),)

@@ -68,6 +68,14 @@ def test_empty_palette_array_falls_back():
     assert style["color_palette"] == ["#808080"]
 
 
+def test_ensure_ascii_false_for_non_ascii_aesthetics():
+    (style_json,) = _node().build(SAMPLE_PALETTE, aesthetics="café façade — naïve", lighting="golden hour")
+    assert "façade" in style_json
+    assert "\\u" not in style_json
+    style = json.loads(style_json)["style_description"]
+    assert style["aesthetics"] == "café façade — naïve"
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_") and callable(fn):

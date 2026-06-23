@@ -93,7 +93,7 @@ class IdeogramPromptAssembler:
             if overlay is None:
                 # Nothing valid to merge: return the base unchanged.
                 notes.append(f"merge_json invalid ({overlay_err}); base returned unchanged")
-                out_json = json.dumps(base) if base_err is None and base else base_json
+                out_json = json.dumps(base, ensure_ascii=False) if base_err is None and base else base_json
                 report = "Merged keys: none\n" + "\n".join(notes)
                 return (out_json, report)
 
@@ -113,7 +113,7 @@ class IdeogramPromptAssembler:
             if updated:
                 lines.append(f"  updated: {', '.join(updated)}")
             lines.extend(notes)
-            return (json.dumps(result), "\n".join(lines))
+            return (json.dumps(result, ensure_ascii=False), "\n".join(lines))
 
         except Exception as e:
             # Never crash: return the base untouched.

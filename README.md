@@ -19,6 +19,7 @@ as composable nodes that wire into a ComfyUI generation workflow.
 - [Why This Exists](#why-this-exists)
 - [What it does](#what-it-does)
 - [Nodes](#nodes)
+- [Ideogram Visual Prompt Designer](#ideogram-visual-prompt-designer)
 - [Example workflow](#example-workflow)
 - [Palette studies (same image, different palettes)](#palette-studies-same-image-different-palettes)
 - [Showcase workflows](#showcase-workflows)
@@ -178,7 +179,7 @@ palettes ≤ 5 colors, and bounding-box coordinates within 0–1000. It reorders
 keys only — it never edits content values.
 
 - **Inputs:** `prompt_json`, `fix_key_order` (BOOLEAN, default True), `strict_mode` (BOOLEAN, default False — when on, warnings also fail validation)
-- **Outputs:** `prompt_json` (optionally key-reordered), `is_valid` (BOOLEAN), `report` (human-readable summary)
+- **Outputs:** `prompt_json` (optionally key-reordered), `is_valid` (BOOLEAN), `report` (human-readable summary), `errors_json` (JSON array of error message strings), `warnings_json` (JSON array of warning message strings) — the latter two added after `v1.1.1` for consumers that need structured data instead of re-parsing `report`'s prose; existing connections to the first three outputs are unaffected.
 
 ### Ideogram Metadata Reader (`IdeogramMetadataReader`)
 Reads an embedded Ideogram JSON prompt back out of a PNG `tEXt` chunk by key.
@@ -240,6 +241,127 @@ collect a variable number of string outputs into a list.
 
 - **Inputs:** `background`, `element_1` (required) through `element_8` (optional)
 - **Outputs:** `compositional_json` (complete block), `element_count` (INT), `overlap_warning` (empty if none)
+
+### Ideogram Visual Prompt Designer (`IdeogramVisualPromptDesigner`)
+Phase 1 of the planned Visual Prompt Designer (see
+[Ideogram Visual Prompt Designer](#ideogram-visual-prompt-designer) below for
+the full picture): builds a prompt from scratch or loads an existing one,
+reconstructs an editable internal "designer state," restores designer-only
+fields from a previously saved state, applies an optional palette override,
+and re-validates the result with `IdeogramJSONValidator` — all through
+standard widgets, no canvas required yet.
+
+- **Inputs:** `high_level_description`, `strict_mode`; optional `prompt_json`, `designer_state_json`, `palette_json`
+- **Outputs:** `ideogram_prompt`, `json_string` (same content as `ideogram_prompt` in this phase), `designer_state` (for round-tripping), `is_valid`, `report`
+
+## Ideogram Visual Prompt Designer
+
+### Why it exists
+
+Ideogram 4's structured prompt JSON is powerful but tedious to hand-author:
+nested objects, strict key ordering, bounding boxes in a non-obvious
+`[ymin, xmin, ymax, xmax]` order, palette size limits. The other nodes in this
+repo (Element Builder/Collector, Prompt Assembler, JSON Validator) make that
+tedium *manageable*, but a user still has to think in JSON shapes to use them.
+The Visual Prompt Designer's goal is to let a user think in subjects,
+composition, style, and palettes instead — the software handles the JSON.
+
+### Visual authoring philosophy
+
+The full vision (closer to a Figma/Blender-scene-graph editing experience than
+a JSON form) needs a custom ComfyUI frontend extension — a drag/resize
+canvas, scene-graph tree, relationship graph, undo/redo history. That's a
+separate, larger effort from the Python node layer this repo is built from so
+far, and is **not implemented yet**.
+
+### What's implemented now (Phase 1) vs. deferred
+
+| Capability | Status |
+| --- | --- |
+| Build a prompt from scratch | **Done** |
+| Load an existing prompt and reconstruct an editable model | **Done** |
+| Round-trip designer-only data (notes, subjects, per-element depth/weight/lock/hide/group) via saved metadata | **Done**, with a known limitation (see below) |
+| Validation on every run, reusing the existing validator (not live-as-you-type — that needs the canvas) | **Done** — `designer_state`'s `validation` field carries structured `errors`/`warnings` lists, not just prose |
+| Palette override | **Done** |
+| Drag/resize composition canvas, scene hierarchy tree, relationship graph, presets, undo/redo, multi-view live preview | **Deferred** — needs a custom JS frontend extension |
+| Auto element detection, prompt diff viewer, template library | **Deferred** (stretch goals) |
+
+### Architecture
+
+Layered, per the spec, so the (future) UI never touches JSON directly:
+
+```
+Layer 1  Visual Model        utils/designer_model.py  -- the "designer state" dict
+Layer 2  Prompt Model         (existing Ideogram 4 schema, unchanged)
+Layer 3  Serialization       utils/designer_model.py  -- serialize/deserialize, both translation directions
+Layer 4  Metadata            IdeogramMetadataEmbedder / IdeogramMetadataReader (existing nodes, reused)
+```
+
+A "designer state" carries both the fields the Ideogram schema knows about
+(description, style, palette, composition elements) **and** designer-only
+fields the schema has no place for (subjects, hierarchy, relationships,
+notes, and per-element depth layer/visual weight/lock/hide/group). The
+schema-visible fields always reflect the most recently loaded `prompt_json`;
+the designer-only fields only exist if restored from a previously saved
+`designer_state_json`.
+
+**Why all three outputs are typed `STRING`, not the spec's distinct
+`IDEOGRAM_PROMPT`/`COLOR_PALETTE` socket types:** every existing node in this
+package (Validator, Assembler, Element Builder/Collector, palette nodes)
+reads and writes plain `STRING` JSON. Introducing a genuinely distinct
+ComfyUI socket type for this node alone would make it unable to plug directly
+into any of them without an adapter node in between — the opposite of the
+"integrate with existing infrastructure" goal. `ideogram_prompt` and
+`json_string` are therefore intentionally identical values today; the
+distinction is reserved for if/when a future, genuinely structured runtime
+type would benefit other Designer-aware nodes enough to justify breaking that
+interop.
+
+### Round-trip workflow (today)
+
+```
+IdeogramVisualPromptDesigner (build/edit)
+  -> ideogram_prompt -> generation -> IdeogramMetadataEmbedder (embed under e.g. "ideogram_prompt")
+  -> designer_state  -> IdeogramMetadataEmbedder (embed under a second key, e.g. "ideogram_designer_state")
+       ... later ...
+  -> IdeogramMetadataReader x2 (read both keys back from the saved PNG)
+  -> IdeogramVisualPromptDesigner (prompt_json + designer_state_json) -> continue editing
+```
+
+**Known limitation:** composition elements are matched between the freshly
+loaded prompt and the saved designer state *by position* (1st element ↔ 1st
+saved element, and so on) — there's no persistent per-element ID yet, since
+that's naturally a canvas-phase concept. Reordering, inserting, or removing
+elements between saves can misalign which saved depth/weight/notes/lock/hide/
+group values land on which element. Safe today: editing the same elements in
+place. Not yet safe: restructuring the element list and expecting designer-only
+metadata to follow the right element.
+
+### Reference image / composition-assisted workflow
+
+Not implemented, and there is deliberately no `reference_image` input yet.
+The original spec's stretch goals call for a "visual reference mode" where a
+loaded image becomes editable overlay regions — that needs the canvas to
+exist first. An earlier draft of this node had a `reference_image` input that
+accepted an image and did nothing with it; that was removed rather than kept
+as a placeholder, since an input with no effect creates the same false
+impression of capability as a decorative ID field would. It will be added
+back when there's an actual canvas to consume it.
+
+### Troubleshooting / FAQ
+
+- **"My loaded prompt's description disappeared."** It shouldn't — leaving
+  `high_level_description` blank when `prompt_json` is wired in preserves the
+  loaded description. Only a non-empty `high_level_description` overrides it.
+- **"My palette didn't change even though I wired `palette_json` in."** Check
+  the `report` output — a malformed `palette_json` (not valid JSON, not an
+  array of hex strings) is skipped with a warning rather than clearing your
+  existing palette.
+- **"Designer-only fields didn't come back after reloading."** See the
+  position-based matching limitation above — if the element list was
+  restructured between saves, that's expected in this phase.
+- **"Where's the visual canvas?"** Not built yet — see the status table
+  above. This node is the backend foundation it will sit on.
 
 ## Example workflow
 

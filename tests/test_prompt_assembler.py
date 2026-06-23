@@ -102,9 +102,28 @@ def test_does_not_mutate_unrelated_content():
     assert result["compositional_deconstruction"]["elements"][0]["color_palette"] == ["#ABCDEF"]
 
 
+def test_ensure_ascii_false_on_normal_merge():
+    base = json.dumps({"high_level_description": "café façade"})
+    merge = json.dumps({"style_description": {"color_palette": ["#FF5733"]}})
+    out_json, _ = _node().assemble(base, merge, True)
+    assert "façade" in out_json
+    assert "\\u" not in out_json
+
+
+def test_ensure_ascii_false_when_merge_invalid():
+    # Exercises the other json.dumps call site (merge_json invalid -> base
+    # returned via the base_err is None and base branch, not base_json itself).
+    base = json.dumps({"high_level_description": "café façade"})
+    out_json, report = _node().assemble(base, "not valid json", True)
+    assert "façade" in out_json
+    assert "\\u" not in out_json
+    assert "merge_json invalid" in report
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_") and callable(fn):
             fn()
             print(f"{name}: OK")
     print("All prompt_assembler tests passed.")
+
